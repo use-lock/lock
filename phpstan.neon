@@ -1,0 +1,17 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - vendor/nesbot/carbon/extension.neon
+    - vendor/pestphp/pest-plugin-phpstan/extension.neon
+
+parameters:
+
+    paths:
+        - app/
+        - tests/
+
+    # Narrows over-broad vendor signatures instead of baselining the errors
+    # they cause. Every stub carries the reason it exists.
+    stubFiles:
+        - stubs/vendor.stub
+
+    level: 8

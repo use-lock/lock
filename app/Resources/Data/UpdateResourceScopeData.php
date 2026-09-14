@@ -1,0 +1,22 @@
+<?php
+declare(strict_types=1);
+
+namespace App\Resources\Data;
+
+use App\Shared\Data\ApiData;
+use Bambamboole\Spectacular\Attributes\SpecProperty;
+use Spatie\LaravelData\Attributes\Validation\Max;
+use Spatie\LaravelData\Attributes\Validation\Regex;
+use Spatie\LaravelData\Optional;
+
+final class UpdateResourceScopeData extends ApiData
+{
+    public function __construct(
+        #[SpecProperty('Scope value, unique within its resource. Whitespace is not allowed.')]
+        #[Max(255), Regex('/\A[A-Za-z0-9][A-Za-z0-9._:\/-]*\z/')]
+        public Optional|string $value,
+        #[SpecProperty('Human readable description of the scope. Null clears the description.')]
+        #[Max(255)]
+        public Optional|string|null $description,
+    ) {}
+}

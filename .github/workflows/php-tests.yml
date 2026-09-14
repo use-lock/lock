@@ -1,0 +1,43 @@
+name: php-tests
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+      - master
+  pull_request:
+    branches:
+      - develop
+      - main
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# No node toolchain and no Playwright download: tests/Pest.php stubs Vite for the
+# Feature suite, so nothing here needs public/build. That work lives in the js and
+# browser workflows.
+#
+# Not sharded: the suite runs in ~15s under --parallel, so a second runner would
+# spend more time on composer install than it saves on tests.
+jobs:
+  php-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-test-env
+
+      - name: Tests
+        timeout-minutes: 6
+        run: php artisan test --compact --parallel --exclude-testsuite Browser

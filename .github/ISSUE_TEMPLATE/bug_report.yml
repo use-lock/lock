@@ -1,0 +1,70 @@
+name: Bug report
+description: Report reproducible behavior that does not work as expected.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Do not include credentials, secrets, or unredacted customer data.
+        Do not report security vulnerabilities in public issues.
+  - type: input
+    id: inventory-id
+    attributes:
+      label: Inventory ID
+      description: Add the related inventory identifier when this report comes from an audit.
+      placeholder: "Example: I2 or C13"
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the problem and its impact.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: List the smallest reliable sequence that demonstrates the problem.
+      placeholder: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What should happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual behavior
+      description: What happens now, including any relevant error message?
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include the branch or commit and any relevant browser, operating system, PHP, or Node.js versions.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Additional evidence
+      description: Add redacted logs, screenshots, traces, or links that help explain the problem.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I searched for an existing issue that describes this problem.
+          required: true
+        - label: I removed credentials, secrets, and unredacted personal or customer data.
+          required: true

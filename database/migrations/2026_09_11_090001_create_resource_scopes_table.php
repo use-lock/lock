@@ -1,0 +1,26 @@
+<?php
+declare(strict_types=1);
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('resource_scopes', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->foreignUuid('resource_id')->constrained()->cascadeOnDelete();
+            $table->string('value', 255);
+            $table->string('description', 255)->nullable();
+            $table->timestamps();
+            $table->unique(['resource_id', 'value']);
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('resource_scopes');
+    }
+};

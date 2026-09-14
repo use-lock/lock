@@ -1,0 +1,152 @@
+{
+    "$schema": "https://getcomposer.org/schema.json",
+    "name": "use-lock/lock",
+    "type": "project",
+    "description": "An OpenID Connect identity provider built on Laravel, with a Lattice server-driven admin console.",
+    "keywords": [
+        "laravel",
+        "oidc",
+        "openid-connect",
+        "identity-provider"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.5",
+        "bambamboole/laravel-i18next": "^0.6.0",
+        "bambamboole/spectacular": "^0.27.0",
+        "inertiajs/inertia-laravel": "^3.3.4",
+        "laravel/framework": "^13.31.0",
+        "laravel/octane": "^2.19.1",
+        "laravel/tinker": "^3.0.2",
+        "lattice-php/api-reference": "^0.77.0",
+        "lattice-php/lattice": "^0.77.0",
+        "sentry/sentry-laravel": "^4.27",
+        "spatie/laravel-data": "^4.23",
+        "use-lock/client-laravel": "^0.1.0",
+        "use-lock/server": "^0.1.0"
+    },
+    "require-dev": {
+        "driftingly/rector-laravel": "^2.6.2",
+        "fakerphp/faker": "^1.24.1",
+        "larastan/larastan": "^3.12",
+        "laravel/boost": "^2.8.1",
+        "laravel/pail": "^1.2.7",
+        "laravel/pao": "^1.1.5",
+        "laravel/pint": "^1.32.1",
+        "mockery/mockery": "^1.6.15",
+        "nunomaduro/collision": "^8.9.5",
+        "pestphp/pest": "^5.1.4",
+        "pestphp/pest-plugin-browser": "^5.0.1",
+        "pestphp/pest-plugin-laravel": "^5.0.1",
+        "pestphp/pest-plugin-phpstan": "^5.2.1",
+        "pestphp/pest-plugin-rector": "^5.0.4",
+        "rector/rector": "^2.6.6",
+        "spatie/laravel-typescript-transformer": "^3.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "setup": [
+            "composer install",
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php artisan app:setup --no-interaction",
+            "npm ci",
+            "npm run build"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php artisan dev"
+        ],
+        "lint": [
+            "pint --parallel"
+        ],
+        "lint:check": [
+            "pint --parallel --test"
+        ],
+        "ci:check": [
+            "Composer\\Config::disableProcessTimeout",
+            "npm run lint:check",
+            "npm run format:check",
+            "npm run types:check",
+            "@phpstan",
+            "@rector:check",
+            "@test"
+        ],
+        "check:full": [
+            "Composer\\Config::disableProcessTimeout",
+            "@ci:check",
+            "npm run build",
+            "@test:browser"
+        ],
+        "phpstan": [
+            "vendor/bin/phpstan analyse --memory-limit=1G"
+        ],
+        "test": [
+            "@php artisan config:clear --ansi",
+            "@lint:check",
+            "@php artisan test --compact --parallel --exclude-testsuite Browser"
+        ],
+        "test:browser": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php artisan test tests/Browser --compact"
+        ],
+        "fresh": [
+            "@php artisan migrate:fresh",
+            "@php artisan app:setup --no-interaction",
+            "@php artisan db:seed"
+        ],
+        "rector:check": [
+            "vendor/bin/rector process --config=rector.php --dry-run"
+        ],
+        "rector:fix": [
+            "vendor/bin/rector process --config=rector.php"
+        ],
+        "hooks:install": "git config core.hooksPath .githooks 2>/dev/null || true",
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi"
+        ],
+        "post-install-cmd": [
+            "@hooks:install"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@php artisan boost:update --ansi",
+            "@hooks:install"
+        ],
+        "pre-package-uninstall": [
+            "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
+        },
+        "lattice": {
+            "discover": [
+                "app"
+            ]
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

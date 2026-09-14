@@ -1,0 +1,66 @@
+@import 'tailwindcss';
+
+@import '@lattice-php/lattice/css';
+@import '@fontsource-variable/instrument-sans/wght.css';
+
+@source '../views';
+@source '../../vendor/lattice-php/*/resources/js';
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Lattice owns the design tokens (--lt-*, cascade-layered defaults); unlayered
+ * overrides here win regardless of import order.
+ */
+:root {
+    --lt-font-sans:
+        'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
+        'Noto Color Emoji';
+}
+
+@layer base {
+    body {
+        @apply bg-lt-bg text-lt-fg;
+    }
+}
+
+/*
+ * Tables sit flush inside a card: negate the card's own --lt-gutter so header
+ * and row dividers reach the card edges instead of floating in the padding.
+ */
+[data-slot='card-content'] [data-slot='table-scroll'] {
+    border-width: 0;
+    border-radius: 0;
+    margin-inline: calc(-1 * var(--lt-gutter));
+}
+
+/*
+ * None of these plain wrapper elements set min-width: 0, so a wide table's
+ * min-content size forces every one of them past the available width instead of
+ * the table's own already-`overflow-x-auto` [data-slot='table-scroll'] containing
+ * it — the whole page ends up scrolling horizontally under the sidebar instead
+ * of just the table. Letting each shrink is what makes that inner scroll
+ * container kick in; harmless elsewhere since it only matters once something
+ * constrains their width from outside.
+ */
+[data-test='lattice-default-container'],
+[data-slot='stack'],
+[data-slot='card'],
+[data-slot='card-content'],
+[data-slot='table'] {
+    min-width: 0;
+}
+
+/*
+ * iOS Safari zooms the page when a focused input's font-size is below 16px,
+ * leaving the layout scaled and cut off. Lattice inputs use text-sm (14px);
+ * force 16px on the small screens where that auto-zoom applies.
+ */
+@media (max-width: 767px) {
+    input,
+    select,
+    textarea {
+        font-size: 16px;
+    }
+}

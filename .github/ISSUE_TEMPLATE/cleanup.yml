@@ -1,0 +1,61 @@
+name: Cleanup
+description: Propose removal, consolidation, or simplification without changing intended behavior.
+title: "[Cleanup] "
+labels:
+  - cleanup
+body:
+  - type: input
+    id: inventory-id
+    attributes:
+      label: Inventory ID
+      description: Add the related inventory identifier when this cleanup comes from an audit.
+      placeholder: "Example: C1 or T2"
+  - type: textarea
+    id: current-state
+    attributes:
+      label: Current state
+      description: Identify the duplication, dead code, inconsistency, or misplaced responsibility.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Link the affected paths and show why the current code is redundant or unnecessarily complex.
+    validations:
+      required: true
+  - type: textarea
+    id: desired-state
+    attributes:
+      label: Desired state
+      description: Describe the simpler end state and the behavior that must remain unchanged.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope boundaries
+      description: List what should change and any adjacent behavior that must stay out of scope.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification
+      description: Explain how behavior preservation and successful cleanup can be demonstrated.
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks or dependencies
+      description: Note migration concerns, follow-up work, or consumers that could be affected.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I confirmed the affected code or configuration still exists on `main`.
+          required: true
+        - label: The proposed cleanup preserves intended behavior.
+          required: true

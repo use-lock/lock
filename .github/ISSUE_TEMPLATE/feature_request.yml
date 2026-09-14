@@ -1,0 +1,60 @@
+name: Feature request
+description: Propose a user or developer outcome that the product does not support yet.
+title: "[Feature] "
+labels:
+  - feature
+body:
+  - type: input
+    id: inventory-id
+    attributes:
+      label: Inventory ID
+      description: Add the related inventory identifier when this request comes from an audit.
+      placeholder: "Example: F12 or P4"
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Who is affected, and what are they unable to accomplish today?
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: Describe the observable result without prescribing unnecessary implementation details.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: List the behavior that belongs in this request and anything explicitly out of scope.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: List the checks that would demonstrate the request is complete.
+      placeholder: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe existing workarounds or materially different approaches, if any.
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add relevant screenshots, examples, dependencies, or follow-up issues.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I searched for an existing request covering the same outcome.
+          required: true

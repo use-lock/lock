@@ -1,0 +1,80 @@
+# Production stack: one image in three roles (web, queue, scheduler) next to Postgres.
+# Coolify runs this file as-is. For a local trial see docs/deployment.md.
+
+x-environment: &environment
+  APP_KEY: ${APP_KEY:?APP_KEY is required}
+  APP_URL: ${APP_URL:?APP_URL is required}
+
+  DB_HOST: postgres
+  DB_DATABASE: lock
+  DB_USERNAME: lock
+  DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+
+  MAIL_URL: ${MAIL_URL:-}
+  MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:?MAIL_FROM_ADDRESS is required}
+
+  SENTRY_LARAVEL_DSN: ${SENTRY_LARAVEL_DSN:-}
+  SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT:-}
+  SENTRY_RELEASE: ${SENTRY_RELEASE:-}
+  SENTRY_ENABLE_LOGS: ${SENTRY_ENABLE_LOGS:-false}
+  SENTRY_TRACES_SAMPLE_RATE: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+
+  LOCK_CONSOLE_CLIENT_ID: ${LOCK_CONSOLE_CLIENT_ID:-}
+  LOCK_CONSOLE_CLIENT_SECRET: ${LOCK_CONSOLE_CLIENT_SECRET:-}
+  LOCK_ADMIN_EMAIL: ${LOCK_ADMIN_EMAIL:-}
+  LOCK_ADMIN_PASSWORD: ${LOCK_ADMIN_PASSWORD:-}
+
+x-app: &app
+  image: ${LOCK_IMAGE:-ghcr.io/use-lock/lock:latest}
+  restart: unless-stopped
+  volumes:
+    - storage:/var/www/html/storage/app
+  environment: *environment
+
+services:
+  app:
+    <<: *app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      <<: *environment
+      AUTORUN_APP_DEPLOY: "true"
+
+  # The app container runs `app:deploy` before it serves, so the workers only start
+  # once it is healthy and the schema is in place.
+  queue:
+    <<: *app
+    depends_on:
+      app:
+        condition: service_healthy
+    command: ["php", "artisan", "queue:work", "--tries=3", "--max-time=3600"]
+    healthcheck:
+      test: ["CMD", "healthcheck-queue"]
+
+  scheduler:
+    <<: *app
+    depends_on:
+      app:
+        condition: service_healthy
+    command: ["php", "artisan", "schedule:work"]
+    healthcheck:
+      test: ["CMD", "healthcheck-schedule"]
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: lock
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "lock"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  storage:
+  postgres:

@@ -1,0 +1,11 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "declare_strict_types": true,
+        "blank_line_after_opening_tag": false,
+        "final_class": true
+    },
+    "notPath": [
+        "tests/TestCase.php"
+    ]
+}

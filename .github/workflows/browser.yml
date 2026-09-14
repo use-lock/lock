@@ -1,0 +1,63 @@
+name: browser
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+      - master
+  pull_request:
+    branches:
+      - develop
+      - main
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+# Split out from the Unit/Feature suites so a flaking browser run reports its own
+# status check instead of failing the context that carries the fast tests.
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
+        with:
+          persist-credentials: false
+
+      - uses: ./.github/actions/setup-test-env
+        with:
+          build_js: 'true'
+          enable_playwright: 'true'
+
+      # The browser suite intermittently hangs inside the last test file on CI
+      # runners (in-process fiber server + Playwright race; never reproduced
+      # locally). The event log pinpoints the exact hang position post-mortem.
+      # Both attempts are bounded: an unbounded retry would let a repeat hang
+      # burn the whole step budget instead of failing with the log.
+      - name: Browser Tests
+        timeout-minutes: 6
+        run: |
+          if timeout 150 php artisan test tests/Browser --compact --log-events-verbose-text=browser-events.log; then
+            exit 0
+          fi
+          echo "::warning::Browser suite hung or failed on the first attempt; retrying once"
+          timeout 150 php artisan test tests/Browser --compact --log-events-verbose-text=browser-events-retry.log
+
+      - name: Upload Browser Artifacts
+        if: failure() || cancelled()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: browser-artifacts
+          path: |
+            browser-events*.log
+            tests/Browser/Screenshots/
+          if-no-files-found: ignore
+          retention-days: 7

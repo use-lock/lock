@@ -1,0 +1,19 @@
+<?php
+
+namespace Illuminate\Foundation\Testing\Concerns;
+
+use Illuminate\Testing\PendingCommand;
+
+/**
+ * Our test suite never calls withoutMockingConsoleOutput(), so artisan()
+ * always returns PendingCommand here — the vendor signature's `int` branch
+ * (taken only when mockConsoleOutput is false) is dead in this app.
+ */
+trait InteractsWithConsole
+{
+    /**
+     * @param  array|string  $command
+     * @param  array  $parameters
+     */
+    public function artisan($command, $parameters = []): PendingCommand {}
+}
