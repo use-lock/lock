@@ -4,20 +4,22 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
+  release:
+    types: [published]
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
 
 permissions:
   contents: read
   packages: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ inputs.tag || github.ref }}
   cancel-in-progress: false
 
-# Builds the runtime image and pushes it to GHCR. `main` moves the `latest`
-# and `main` tags; a `v*` tag publishes its semver tags. Every build also
-# carries the commit SHA so a deployment can pin exactly what it runs.
 jobs:
   image:
     runs-on: ubuntu-latest
@@ -27,6 +29,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v6
         with:
           persist-credentials: false
+          ref: ${{ inputs.tag || github.event.release.tag_name || github.sha }}
 
       - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
@@ -39,13 +42,15 @@ jobs:
       - id: meta
         uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
+          context: git
           images: ghcr.io/use-lock/lock
+          flavor: latest=false
           tags: |
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=main,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+            type=semver,pattern={{version}},value=${{ inputs.tag || github.event.release.tag_name }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.tag || github.event.release.tag_name }}
             type=sha,format=long
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value=latest,enable=${{ (inputs.tag != '' || github.event_name == 'release') && !github.event.release.prerelease && !contains(inputs.tag || github.event.release.tag_name, '-') }}
 
       - uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
         with:

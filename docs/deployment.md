@@ -7,6 +7,12 @@ never share state.
 
 ## The image
 
+Release Please maintains the release PR, starting at `0.1.0`. Merging that PR creates the GitHub release and
+builds its exact tag into `ghcr.io/use-lock/lock:0.1.0`, `:0.1`, and `:latest`. Pre-releases do not move `latest`.
+Pushes to `main` publish `:main`; every image also gets a `sha-<commit>` tag. The release workflow calls the image
+build directly, so publishing works with `GITHUB_TOKEN` without a personal access token. Release PR checks are
+started explicitly for the same reason.
+
 - **Base: `serversideup/php:8.5-frankenphp`, serving through Laravel Octane in FrankenPHP worker mode.** The
   application boots once per worker and then serves many requests, so nothing request-specific may live in a
   singleton or a static property (see the `laravel-octane` guidelines). Octane clones the booted container for every

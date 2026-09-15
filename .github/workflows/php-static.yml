@@ -1,6 +1,7 @@
 name: php-static
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
