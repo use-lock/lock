@@ -2,3 +2,4 @@
 # reformat on their own, but the mapping is load-bearing enough to keep the
 # formatter off it entirely.
 .ai/rules/index.md
+/CHANGELOG.md
