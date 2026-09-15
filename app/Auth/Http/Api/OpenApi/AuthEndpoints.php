@@ -124,7 +124,7 @@ final class AuthEndpoints implements EndpointDefinition
             'resource' => $this->resourceProperty(),
         ];
         $grants = [
-            [
+            'AuthorizationCodeRequest' => [
                 'title' => 'Authorization code',
                 'required' => ['grant_type', 'code', 'code_verifier'],
                 'properties' => $common + [
@@ -134,17 +134,17 @@ final class AuthEndpoints implements EndpointDefinition
                     'redirect_uri' => $string + ['format' => 'uri', 'description' => 'Required if supplied in the authorization request; must match it exactly.'],
                 ],
             ],
-            [
+            'RefreshTokenRequest' => [
                 'title' => 'Refresh token',
                 'required' => ['grant_type', 'refresh_token'],
                 'properties' => $common + ['grant_type' => $string + ['enum' => ['refresh_token']], 'refresh_token' => $string],
             ],
-            [
+            'ClientCredentialsRequest' => [
                 'title' => 'Client credentials',
                 'required' => ['grant_type'],
                 'properties' => $common + ['grant_type' => $string + ['enum' => ['client_credentials']]],
             ],
-            [
+            'TokenExchangeRequest' => [
                 'title' => 'Token exchange',
                 'required' => ['grant_type', 'subject_token', 'subject_token_type'],
                 'anyOf' => [['required' => ['audience']], ['required' => ['resource']]],
@@ -159,12 +159,22 @@ final class AuthEndpoints implements EndpointDefinition
             ],
         ];
 
+        $mapping = [];
+        foreach ($grants as $name => $grant) {
+            $mapping[$grant['properties']['grant_type']['enum'][0]] = '#/components/schemas/'.$name;
+        }
+
         return [
             'OAuthError' => [
                 'type' => 'object', 'required' => ['error', 'error_description'],
                 'properties' => ['error' => $string, 'error_description' => $string],
             ],
-            'OAuthTokenRequest' => ['oneOf' => array_map(fn (array $grant): array => ['type' => 'object', ...$grant], $grants)],
+            'OAuthTokenRequest' => [
+                'type' => 'object',
+                'oneOf' => array_map(fn (string $reference): array => ['$ref' => $reference], array_values($mapping)),
+                'discriminator' => ['propertyName' => 'grant_type', 'mapping' => $mapping],
+            ],
+            ...array_map(fn (array $grant): array => ['type' => 'object', ...$grant], $grants),
             'OAuthTokenResponse' => [
                 'type' => 'object', 'required' => ['access_token', 'token_type', 'expires_in'],
                 'properties' => [

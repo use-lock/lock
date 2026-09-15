@@ -4518,6 +4518,98 @@
             }
         },
         "schemas": {
+            "AuthorizationCodeRequest": {
+                "type": "object",
+                "title": "Authorization code",
+                "required": ["grant_type", "code", "code_verifier"],
+                "properties": {
+                    "client_id": {
+                        "type": "string",
+                        "description": "Required for form-secret and public-client authentication. Omit when using HTTP Basic."
+                    },
+                    "client_secret": {
+                        "type": "string",
+                        "description": "Required only for client_secret_post. Never combine with HTTP Basic."
+                    },
+                    "scope": {
+                        "type": "string",
+                        "description": "Space-delimited scopes for client credentials, refresh or exchange. Refresh and exchange can only narrow granted scopes; authorization-code redemption uses the approved scopes."
+                    },
+                    "resource": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uri"
+                                }
+                            }
+                        ],
+                        "description": "Absolute protected-resource URI without a fragment, or an array of such URIs using resource[] fields. Authorization and client-credentials requests default to the realm audience. Code and refresh grants preserve the original audiences when omitted, or narrow them when supplied."
+                    },
+                    "grant_type": {
+                        "type": "string",
+                        "enum": ["authorization_code"]
+                    },
+                    "code": {
+                        "type": "string"
+                    },
+                    "code_verifier": {
+                        "type": "string",
+                        "minLength": 43,
+                        "maxLength": 128,
+                        "pattern": "^[A-Za-z0-9._~-]+$"
+                    },
+                    "redirect_uri": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Required if supplied in the authorization request; must match it exactly."
+                    }
+                }
+            },
+            "ClientCredentialsRequest": {
+                "type": "object",
+                "title": "Client credentials",
+                "required": ["grant_type"],
+                "properties": {
+                    "client_id": {
+                        "type": "string",
+                        "description": "Required for form-secret and public-client authentication. Omit when using HTTP Basic."
+                    },
+                    "client_secret": {
+                        "type": "string",
+                        "description": "Required only for client_secret_post. Never combine with HTTP Basic."
+                    },
+                    "scope": {
+                        "type": "string",
+                        "description": "Space-delimited scopes for client credentials, refresh or exchange. Refresh and exchange can only narrow granted scopes; authorization-code redemption uses the approved scopes."
+                    },
+                    "resource": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uri"
+                                }
+                            }
+                        ],
+                        "description": "Absolute protected-resource URI without a fragment, or an array of such URIs using resource[] fields. Authorization and client-credentials requests default to the realm audience. Code and refresh grants preserve the original audiences when omitted, or narrow them when supplied."
+                    },
+                    "grant_type": {
+                        "type": "string",
+                        "enum": ["client_credentials"]
+                    }
+                }
+            },
             "ClientData": {
                 "type": "object",
                 "properties": {
@@ -5174,194 +5266,30 @@
                 }
             },
             "OAuthTokenRequest": {
+                "type": "object",
                 "oneOf": [
                     {
-                        "type": "object",
-                        "title": "Authorization code",
-                        "required": ["grant_type", "code", "code_verifier"],
-                        "properties": {
-                            "client_id": {
-                                "type": "string",
-                                "description": "Required for form-secret and public-client authentication. Omit when using HTTP Basic."
-                            },
-                            "client_secret": {
-                                "type": "string",
-                                "description": "Required only for client_secret_post. Never combine with HTTP Basic."
-                            },
-                            "scope": {
-                                "type": "string",
-                                "description": "Space-delimited scopes for client credentials, refresh or exchange. Refresh and exchange can only narrow granted scopes; authorization-code redemption uses the approved scopes."
-                            },
-                            "resource": {
-                                "oneOf": [
-                                    {
-                                        "type": "string",
-                                        "format": "uri"
-                                    },
-                                    {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uri"
-                                        }
-                                    }
-                                ],
-                                "description": "Absolute protected-resource URI without a fragment, or an array of such URIs using resource[] fields. Authorization and client-credentials requests default to the realm audience. Code and refresh grants preserve the original audiences when omitted, or narrow them when supplied."
-                            },
-                            "grant_type": {
-                                "type": "string",
-                                "enum": ["authorization_code"]
-                            },
-                            "code": {
-                                "type": "string"
-                            },
-                            "code_verifier": {
-                                "type": "string",
-                                "minLength": 43,
-                                "maxLength": 128,
-                                "pattern": "^[A-Za-z0-9._~-]+$"
-                            },
-                            "redirect_uri": {
-                                "type": "string",
-                                "format": "uri",
-                                "description": "Required if supplied in the authorization request; must match it exactly."
-                            }
-                        }
+                        "$ref": "#/components/schemas/AuthorizationCodeRequest"
                     },
                     {
-                        "type": "object",
-                        "title": "Refresh token",
-                        "required": ["grant_type", "refresh_token"],
-                        "properties": {
-                            "client_id": {
-                                "type": "string",
-                                "description": "Required for form-secret and public-client authentication. Omit when using HTTP Basic."
-                            },
-                            "client_secret": {
-                                "type": "string",
-                                "description": "Required only for client_secret_post. Never combine with HTTP Basic."
-                            },
-                            "scope": {
-                                "type": "string",
-                                "description": "Space-delimited scopes for client credentials, refresh or exchange. Refresh and exchange can only narrow granted scopes; authorization-code redemption uses the approved scopes."
-                            },
-                            "resource": {
-                                "oneOf": [
-                                    {
-                                        "type": "string",
-                                        "format": "uri"
-                                    },
-                                    {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uri"
-                                        }
-                                    }
-                                ],
-                                "description": "Absolute protected-resource URI without a fragment, or an array of such URIs using resource[] fields. Authorization and client-credentials requests default to the realm audience. Code and refresh grants preserve the original audiences when omitted, or narrow them when supplied."
-                            },
-                            "grant_type": {
-                                "type": "string",
-                                "enum": ["refresh_token"]
-                            },
-                            "refresh_token": {
-                                "type": "string"
-                            }
-                        }
+                        "$ref": "#/components/schemas/RefreshTokenRequest"
                     },
                     {
-                        "type": "object",
-                        "title": "Client credentials",
-                        "required": ["grant_type"],
-                        "properties": {
-                            "client_id": {
-                                "type": "string",
-                                "description": "Required for form-secret and public-client authentication. Omit when using HTTP Basic."
-                            },
-                            "client_secret": {
-                                "type": "string",
-                                "description": "Required only for client_secret_post. Never combine with HTTP Basic."
-                            },
-                            "scope": {
-                                "type": "string",
-                                "description": "Space-delimited scopes for client credentials, refresh or exchange. Refresh and exchange can only narrow granted scopes; authorization-code redemption uses the approved scopes."
-                            },
-                            "resource": {
-                                "oneOf": [
-                                    {
-                                        "type": "string",
-                                        "format": "uri"
-                                    },
-                                    {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "string",
-                                            "format": "uri"
-                                        }
-                                    }
-                                ],
-                                "description": "Absolute protected-resource URI without a fragment, or an array of such URIs using resource[] fields. Authorization and client-credentials requests default to the realm audience. Code and refresh grants preserve the original audiences when omitted, or narrow them when supplied."
-                            },
-                            "grant_type": {
-                                "type": "string",
-                                "enum": ["client_credentials"]
-                            }
-                        }
+                        "$ref": "#/components/schemas/ClientCredentialsRequest"
                     },
                     {
-                        "type": "object",
-                        "title": "Token exchange",
-                        "required": ["grant_type", "subject_token", "subject_token_type"],
-                        "anyOf": [
-                            {
-                                "required": ["audience"]
-                            },
-                            {
-                                "required": ["resource"]
-                            }
-                        ],
-                        "properties": {
-                            "resource": {
-                                "type": "string",
-                                "format": "uri",
-                                "description": "Single target audience. Must agree with audience when both are supplied."
-                            },
-                            "client_id": {
-                                "type": "string",
-                                "description": "Required for form-secret and public-client authentication. Omit when using HTTP Basic."
-                            },
-                            "client_secret": {
-                                "type": "string",
-                                "description": "Required only for client_secret_post. Never combine with HTTP Basic."
-                            },
-                            "scope": {
-                                "type": "string",
-                                "description": "Space-delimited scopes for client credentials, refresh or exchange. Refresh and exchange can only narrow granted scopes; authorization-code redemption uses the approved scopes."
-                            },
-                            "grant_type": {
-                                "type": "string",
-                                "enum": ["urn:ietf:params:oauth:grant-type:token-exchange"]
-                            },
-                            "subject_token": {
-                                "type": "string"
-                            },
-                            "subject_token_type": {
-                                "type": "string",
-                                "enum": ["urn:ietf:params:oauth:token-type:access_token"]
-                            },
-                            "requested_token_type": {
-                                "type": "string",
-                                "enum": ["urn:ietf:params:oauth:token-type:access_token"]
-                            },
-                            "audience": {
-                                "type": "string",
-                                "description": "Required unless resource is supplied; when both are supplied, they must match."
-                            }
-                        },
-                        "description": "actor_token and actor_token_type are unsupported. Additional grant parameters may be consumed by configured token-exchange extensions."
+                        "$ref": "#/components/schemas/TokenExchangeRequest"
                     }
-                ]
+                ],
+                "discriminator": {
+                    "propertyName": "grant_type",
+                    "mapping": {
+                        "authorization_code": "#/components/schemas/AuthorizationCodeRequest",
+                        "refresh_token": "#/components/schemas/RefreshTokenRequest",
+                        "client_credentials": "#/components/schemas/ClientCredentialsRequest",
+                        "urn:ietf:params:oauth:grant-type:token-exchange": "#/components/schemas/TokenExchangeRequest"
+                    }
+                }
             },
             "OAuthTokenResponse": {
                 "type": "object",
@@ -6041,6 +5969,48 @@
                 },
                 "title": "RealmSettingsPatch"
             },
+            "RefreshTokenRequest": {
+                "type": "object",
+                "title": "Refresh token",
+                "required": ["grant_type", "refresh_token"],
+                "properties": {
+                    "client_id": {
+                        "type": "string",
+                        "description": "Required for form-secret and public-client authentication. Omit when using HTTP Basic."
+                    },
+                    "client_secret": {
+                        "type": "string",
+                        "description": "Required only for client_secret_post. Never combine with HTTP Basic."
+                    },
+                    "scope": {
+                        "type": "string",
+                        "description": "Space-delimited scopes for client credentials, refresh or exchange. Refresh and exchange can only narrow granted scopes; authorization-code redemption uses the approved scopes."
+                    },
+                    "resource": {
+                        "oneOf": [
+                            {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "uri"
+                                }
+                            }
+                        ],
+                        "description": "Absolute protected-resource URI without a fragment, or an array of such URIs using resource[] fields. Authorization and client-credentials requests default to the realm audience. Code and refresh grants preserve the original audiences when omitted, or narrow them when supplied."
+                    },
+                    "grant_type": {
+                        "type": "string",
+                        "enum": ["refresh_token"]
+                    },
+                    "refresh_token": {
+                        "type": "string"
+                    }
+                }
+            },
             "ResourceData": {
                 "type": "object",
                 "properties": {
@@ -6237,6 +6207,58 @@
                 "description": "RFC 7591 \u00a72 / OIDC Registration \u00a72: how a client authenticates at the token, introspection and revocation endpoints. Enforced exactly: a client registered for one method is refused when it presents another.\n",
                 "enum": ["client_secret_basic", "client_secret_post", "none"],
                 "title": "TokenEndpointAuthMethod"
+            },
+            "TokenExchangeRequest": {
+                "type": "object",
+                "title": "Token exchange",
+                "required": ["grant_type", "subject_token", "subject_token_type"],
+                "anyOf": [
+                    {
+                        "required": ["audience"]
+                    },
+                    {
+                        "required": ["resource"]
+                    }
+                ],
+                "properties": {
+                    "resource": {
+                        "type": "string",
+                        "format": "uri",
+                        "description": "Single target audience. Must agree with audience when both are supplied."
+                    },
+                    "client_id": {
+                        "type": "string",
+                        "description": "Required for form-secret and public-client authentication. Omit when using HTTP Basic."
+                    },
+                    "client_secret": {
+                        "type": "string",
+                        "description": "Required only for client_secret_post. Never combine with HTTP Basic."
+                    },
+                    "scope": {
+                        "type": "string",
+                        "description": "Space-delimited scopes for client credentials, refresh or exchange. Refresh and exchange can only narrow granted scopes; authorization-code redemption uses the approved scopes."
+                    },
+                    "grant_type": {
+                        "type": "string",
+                        "enum": ["urn:ietf:params:oauth:grant-type:token-exchange"]
+                    },
+                    "subject_token": {
+                        "type": "string"
+                    },
+                    "subject_token_type": {
+                        "type": "string",
+                        "enum": ["urn:ietf:params:oauth:token-type:access_token"]
+                    },
+                    "requested_token_type": {
+                        "type": "string",
+                        "enum": ["urn:ietf:params:oauth:token-type:access_token"]
+                    },
+                    "audience": {
+                        "type": "string",
+                        "description": "Required unless resource is supplied; when both are supplied, they must match."
+                    }
+                },
+                "description": "actor_token and actor_token_type are unsupported. Additional grant parameters may be consumed by configured token-exchange extensions."
             },
             "UpdateClientData": {
                 "type": "object",

@@ -40,7 +40,6 @@ it('exports form grants and browser query parameters without inferred validation
 
     expect($token['requestBody']['content'])->toHaveKey('application/x-www-form-urlencoded')
         ->and($token['responses'])->toHaveKeys(['200', '400', '401', '429', '500'])->not->toHaveKey('422')
-        ->and($document['components']['schemas']['OAuthTokenRequest']['oneOf'])->toHaveCount(4)
         ->and($document['components']['schemas']['OAuthTokenResponse']['required'])->toBe(['access_token', 'token_type', 'expires_in'])
         ->and($document['components']['schemas']['OAuthTokenResponse']['properties'])->toHaveKeys(['refresh_token', 'id_token', 'issued_token_type']);
 
@@ -69,4 +68,44 @@ it('documents client authentication and user bearer tokens without weakening man
         ->and($document['paths']['/oauth/register']['post']['security'])->toBe([])
         ->and($document['paths']['/oauth/authorize']['get']['security'])->toBe([])
         ->and($document['paths']['/v1/realms/{realm}/resources']['get']['security'])->toBe([['oauth2' => [ManagementScope::ResourcesRead->value]]]);
+});
+
+it('exports named token grants with a discriminator and their validation constraints', function () {
+    $document = app(Generator::class)();
+    $schemas = $document['components']['schemas'];
+    $mapping = [
+        'authorization_code' => '#/components/schemas/AuthorizationCodeRequest',
+        'refresh_token' => '#/components/schemas/RefreshTokenRequest',
+        'client_credentials' => '#/components/schemas/ClientCredentialsRequest',
+        'urn:ietf:params:oauth:grant-type:token-exchange' => '#/components/schemas/TokenExchangeRequest',
+    ];
+
+    expect($schemas['OAuthTokenRequest']['discriminator'])->toBe([
+        'propertyName' => 'grant_type',
+        'mapping' => $mapping,
+    ])
+        ->and($schemas['OAuthTokenRequest']['oneOf'])->toBe([
+            ['$ref' => '#/components/schemas/AuthorizationCodeRequest'],
+            ['$ref' => '#/components/schemas/RefreshTokenRequest'],
+            ['$ref' => '#/components/schemas/ClientCredentialsRequest'],
+            ['$ref' => '#/components/schemas/TokenExchangeRequest'],
+        ]);
+    foreach ($mapping as $grantType => $reference) {
+        $schema = $schemas[basename($reference)];
+        expect($schema['required'])->toContain('grant_type')
+            ->and($schema['properties']['grant_type']['enum'])->toBe([$grantType]);
+    }
+    expect($schemas['AuthorizationCodeRequest']['required'])->toBe(['grant_type', 'code', 'code_verifier'])
+        ->and($schemas['AuthorizationCodeRequest']['properties']['code_verifier'])->toMatchArray([
+            'minLength' => 43,
+            'maxLength' => 128,
+            'pattern' => '^[A-Za-z0-9._~-]+$',
+        ])
+        ->and($schemas['RefreshTokenRequest']['required'])->toBe(['grant_type', 'refresh_token'])
+        ->and($schemas['ClientCredentialsRequest']['required'])->toBe(['grant_type'])
+        ->and($schemas['TokenExchangeRequest']['required'])->toBe(['grant_type', 'subject_token', 'subject_token_type'])
+        ->and($schemas['TokenExchangeRequest']['anyOf'])->toBe([
+            ['required' => ['audience']],
+            ['required' => ['resource']],
+        ]);
 });
