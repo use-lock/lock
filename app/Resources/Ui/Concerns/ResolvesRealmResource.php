@@ -38,7 +38,7 @@ trait ResolvesRealmResource
     }
 
     /**
-     * The management API's rows belong to `app:deploy`, so the console offers no
+     * The built-in API rows belong to `app:deploy`, so the console offers no
      * way to rename or delete them — the domain action refuses either way.
      */
     private function mutableResourceOrNull(): ?Resource

@@ -29,7 +29,7 @@ use Lattice\Ui\Enums\DateTimeStyle;
 use Lattice\Ui\Enums\Width;
 use Lattice\Ui\PageSchema;
 
-#[AsPage(route: '/admin/realms/{realm}/social-providers/{socialProvider}', name: 'admin.realms.social-providers.show', can: ManagementScope::RealmsRead)]
+#[AsPage(route: '/admin/realms/{realm}/social-providers/{socialProvider}', name: 'admin.realms.social-providers.show', can: ManagementScope::SocialProvidersRead)]
 final class SocialProviderDetailPage extends AdminPage
 {
     public function render(PageSchema $schema, Realm $realm, RealmSocialProvider $socialProvider): PageSchema
@@ -62,7 +62,7 @@ final class SocialProviderDetailPage extends AdminPage
             ->value($provider->enabled ? __('common.value.yes') : __('common.value.no'))
             ->color($provider->enabled ? ColorName::Success : ColorName::Muted);
 
-        if (Gate::allows(ManagementScope::RealmsWrite)) {
+        if (Gate::allows(ManagementScope::SocialProvidersWrite)) {
             $enabled->disclosure([Form::use(UpdateSocialProviderForm::class, ['field' => 'enabled'])]);
         }
 
@@ -107,7 +107,7 @@ final class SocialProviderDetailPage extends AdminPage
                 ->placeholder(__('common.value.none'));
         }
 
-        return Gate::allows(ManagementScope::RealmsWrite)
+        return Gate::allows(ManagementScope::SocialProvidersWrite)
             ? $entry->disclosure([Form::use(UpdateSocialProviderForm::class, ['field' => $name])])
             : $entry;
     }

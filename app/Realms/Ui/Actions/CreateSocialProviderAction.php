@@ -17,7 +17,7 @@ use Lattice\Core\Attributes\AsAction;
 use Lattice\Form\FormData;
 use Lattice\Ui\Enums\Variant;
 
-#[AsAction('admin.social-providers.create', can: ManagementScope::RealmsWrite)]
+#[AsAction('admin.social-providers.create', can: ManagementScope::SocialProvidersWrite)]
 final class CreateSocialProviderAction extends ActionDefinition
 {
     use BuildsSocialProviderFields;

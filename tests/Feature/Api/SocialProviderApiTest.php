@@ -15,7 +15,7 @@ use function Tests\Helpers\realmUrl;
 it('creates social providers without exposing their secrets', function (string $driver, array $config, string $secret) {
     $realm = Realm::factory()->create();
 
-    $response = $this->withToken(managementApiToken($this, ManagementScope::RealmsWrite))
+    $response = $this->withToken(managementApiToken($this, ManagementScope::SocialProvidersWrite))
         ->postJson(realmUrl(Realm::master(), "/api/v1/realms/{$realm->slug}/social-providers"), [
             'key' => 'company-login', 'driver' => $driver, 'config' => $config, 'enabled' => true,
         ])->assertCreated()->assertJsonPath('data.key', 'company-login')
@@ -40,7 +40,7 @@ it('lists and shows only providers in the addressed realm without secrets', func
     RealmSocialProvider::factory()->for($provider->realm)->oidc()->create();
     RealmSocialProvider::factory()->create();
     $url = realmUrl(Realm::master(), "/api/v1/realms/{$provider->realm->slug}/social-providers");
-    $this->withToken(managementApiToken($this, ManagementScope::RealmsRead));
+    $this->withToken(managementApiToken($this, ManagementScope::SocialProvidersRead));
 
     $this->getJson($url.'?filter[driver]=google&sort=key&per_page=1')->assertOk()
         ->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $provider->id)->assertDontSee('hidden-secret');
@@ -53,7 +53,7 @@ it('partially updates credentials and preserves omitted or blank secrets', funct
     $provider = RealmSocialProvider::factory()->create(['config' => ['client_id' => 'old-id', 'client_secret' => 'keep-secret']]);
     $config = $secret === 'omitted' ? ['client_id' => 'new-id'] : ['client_id' => 'new-id', 'client_secret' => $secret];
 
-    $this->withToken(managementApiToken($this, ManagementScope::RealmsWrite))
+    $this->withToken(managementApiToken($this, ManagementScope::SocialProvidersWrite))
         ->patchJson(realmUrl(Realm::master(), "/api/v1/realms/{$provider->realm->slug}/social-providers/{$provider->id}"), [
             'config' => $config, 'enabled' => false,
         ])->assertOk()->assertJsonPath('data.enabled', false)->assertDontSee('keep-secret');
@@ -64,7 +64,7 @@ it('partially updates credentials and preserves omitted or blank secrets', funct
 it('rotates secrets without disclosing them and treats an empty update as a no-op', function () {
     $provider = RealmSocialProvider::factory()->create();
     $url = realmUrl(Realm::master(), "/api/v1/realms/{$provider->realm->slug}/social-providers/{$provider->id}");
-    $this->withToken(managementApiToken($this, ManagementScope::RealmsWrite));
+    $this->withToken(managementApiToken($this, ManagementScope::SocialProvidersWrite));
 
     $this->patchJson($url, ['config' => ['client_secret' => 'replacement-secret']])->assertOk()->assertDontSee('replacement-secret');
     auth()->forgetGuards();
@@ -79,7 +79,7 @@ it('rejects malformed provider creation payloads', function (array $payload, str
     $realm = Realm::factory()->create();
     $payload = array_replace(['key' => 'google', 'driver' => 'google', 'config' => ['client_id' => 'id', 'client_secret' => 'secret'], 'enabled' => true], $payload);
 
-    $this->withToken(managementApiToken($this, ManagementScope::RealmsWrite))
+    $this->withToken(managementApiToken($this, ManagementScope::SocialProvidersWrite))
         ->postJson(realmUrl(Realm::master(), "/api/v1/realms/{$realm->slug}/social-providers"), $payload)
         ->assertUnprocessable()->assertJsonValidationErrors($field);
 
@@ -98,7 +98,7 @@ it('rejects immutable fields and invalid partial credential updates', function (
     $provider = RealmSocialProvider::factory()->create();
     $original = $provider->config;
 
-    $this->withToken(managementApiToken($this, ManagementScope::RealmsWrite))
+    $this->withToken(managementApiToken($this, ManagementScope::SocialProvidersWrite))
         ->patchJson(realmUrl(Realm::master(), "/api/v1/realms/{$provider->realm->slug}/social-providers/{$provider->id}"), $payload)
         ->assertUnprocessable()->assertJsonValidationErrors($field);
 
@@ -115,7 +115,7 @@ it('enforces provider key uniqueness within each realm', function () {
     $provider = RealmSocialProvider::factory()->create();
     $other = Realm::factory()->create();
     $payload = ['key' => 'google', 'driver' => 'google', 'config' => $provider->config, 'enabled' => true];
-    $this->withToken(managementApiToken($this, ManagementScope::RealmsWrite));
+    $this->withToken(managementApiToken($this, ManagementScope::SocialProvidersWrite));
 
     $this->postJson(realmUrl(Realm::master(), "/api/v1/realms/{$provider->realm->slug}/social-providers"), $payload)
         ->assertUnprocessable()->assertJsonValidationErrors('key');
@@ -129,7 +129,7 @@ it('does not read or mutate providers through another realm', function (string $
     $provider = RealmSocialProvider::factory()->create();
     $other = Realm::factory()->create();
 
-    $this->withToken(managementApiToken($this, ManagementScope::RealmsRead, ManagementScope::RealmsWrite))
+    $this->withToken(managementApiToken($this, ManagementScope::SocialProvidersRead, ManagementScope::SocialProvidersWrite))
         ->json($method, realmUrl(Realm::master(), "/api/v1/realms/{$other->slug}/social-providers/{$provider->id}"), ['enabled' => false])
         ->assertNotFound();
 
@@ -143,7 +143,7 @@ it('deletes a provider and its realm-local social links', function () {
     $otherUser = User::factory()->create();
     $other = SocialAccount::factory()->create(['realm' => $otherUser->realm->slug, 'user_id' => $otherUser->id, 'provider' => $provider->key]);
 
-    $this->withToken(managementApiToken($this, ManagementScope::RealmsWrite))
+    $this->withToken(managementApiToken($this, ManagementScope::SocialProvidersWrite))
         ->deleteJson(realmUrl(Realm::master(), "/api/v1/realms/{$provider->realm->slug}/social-providers/{$provider->id}"))->assertNoContent();
 
     $this->assertModelMissing($provider);
@@ -156,7 +156,7 @@ it('requires authentication and realm write scope', function () {
     $url = realmUrl(Realm::master(), "/api/v1/realms/{$provider->realm->slug}/social-providers/{$provider->id}");
 
     $this->getJson($url)->assertUnauthorized();
-    $this->withToken(managementApiToken($this, ManagementScope::RealmsRead))->deleteJson($url)->assertForbidden();
+    $this->withToken(managementApiToken($this, ManagementScope::SocialProvidersRead))->deleteJson($url)->assertForbidden();
 
     $this->assertModelExists($provider);
 });
@@ -164,14 +164,14 @@ it('requires authentication and realm write scope', function () {
 it('documents social provider operations and payloads for the API playground', function () {
     $document = app(Generator::class)();
     $collection = '/v1/realms/{realm}/social-providers';
-    $item = $collection.'/{socialProvider}';
+    $item = $collection.'/{social_provider}';
 
     foreach ([$collection, $item] as $path) {
-        expect($document['paths'][$path]['get']['security'])->toBe([['oauth2' => ['realms:read']]]);
+        expect($document['paths'][$path]['get']['security'])->toBe([['oauth2' => ['social-providers:read']]]);
     }
 
     foreach (['post' => $collection, 'put' => $item, 'delete' => $item] as $method => $path) {
-        expect($document['paths'][$path][$method]['security'])->toBe([['oauth2' => ['realms:write']]]);
+        expect($document['paths'][$path][$method]['security'])->toBe([['oauth2' => ['social-providers:write']]]);
     }
 
     expect($document['paths'][$collection]['post']['responses'])->toHaveKey('201')->not->toHaveKey('200')

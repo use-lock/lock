@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Auth\Models;
 
 use App\Admin\Enums\ManagementScope;
-use App\Admin\ManagementApi;
 use App\Realms\Models\Realm;
 use App\Resources\Models\ResourceScope;
 use App\Roles\Models\Role;
@@ -141,7 +140,7 @@ final class User extends Authenticatable implements HasLocalePreference, MustVer
      * The management API scopes this person's roles grant. Matching the
      * resource and not just the value matters: any realm may declare a
      * resource whose scope reads `realms:write`, and only the master realm's
-     * `api` resource means the console.
+     * matching Admin or Management API resource means the console.
      *
      * Loaded rather than queried: a users table ran over three hundred queries
      * when every gate check re-read the pivot. `loadMissing` walks the whole
@@ -159,8 +158,10 @@ final class User extends Authenticatable implements HasLocalePreference, MustVer
         $this->loadMissing(['roles.scopes.resource']);
 
         return $this->roles
+            ->filter(fn (Role $role): bool => $role->realm_id === $this->realm_id)
             ->flatMap(fn (Role $role): array => $role->scopes->all())
-            ->filter(fn (ResourceScope $scope): bool => $scope->resource->identifier === ManagementApi::RESOURCE)
+            ->filter(fn (ResourceScope $scope): bool => $scope->resource->realm_id === $this->realm_id
+                && ManagementScope::tryFrom($scope->value)?->apiResource()->value === $scope->resource->identifier)
             ->map(fn (ResourceScope $scope): string => $scope->value)
             ->unique()
             ->values();

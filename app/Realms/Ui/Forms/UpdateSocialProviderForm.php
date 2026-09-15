@@ -25,7 +25,7 @@ use Lattice\Ui\Enums\Variant;
  * carry keeps the value the provider already holds, and a blank secret keeps
  * the stored one.
  */
-#[AsForm('admin.social-providers.update', can: ManagementScope::RealmsWrite)]
+#[AsForm('admin.social-providers.update', can: ManagementScope::SocialProvidersWrite)]
 final class UpdateSocialProviderForm extends FormDefinition
 {
     use BuildsSocialProviderFields;

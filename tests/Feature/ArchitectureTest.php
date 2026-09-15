@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Admin\Enums\ApiResource;
 use App\Admin\Enums\BootstrapOutcome;
 use App\Admin\Enums\ManagementScope;
 use App\Admin\ManagementApi;
@@ -155,6 +156,7 @@ function architecturePublicTypes(): array
         Resource::class,
         ResourceScope::class,
         ManagementApi::class,
+        ApiResource::class,
         ManagementRoles::class,
         ManagementScope::class,
         BootstrapOutcome::class,

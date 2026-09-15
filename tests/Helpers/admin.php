@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Helpers;
 
 use App\Admin\Enums\ManagementScope;
-use App\Admin\ManagementApi;
 use App\Admin\ManagementRoles;
 use App\Auth\Models\User;
 use App\Realms\Models\Realm;
@@ -45,11 +44,9 @@ function globalAdminWith(ManagementScope ...$scopes): User
  */
 function managementScopeIds(ManagementScope ...$scopes): array
 {
-    $resource = Realm::master()->realmResources()->where('identifier', ManagementApi::RESOURCE)->sole();
+    $realm = Realm::master();
 
-    return array_values($resource->scopes()
-        ->whereIn('value', array_map(fn (ManagementScope $scope): string => $scope->value, $scopes))
-        ->pluck('id')
-        ->map(fn (mixed $id): string => (string) $id)
-        ->all());
+    return array_values(array_map(fn (ManagementScope $scope): string => $realm->realmResources()
+        ->where('identifier', $scope->apiResource()->value)
+        ->sole()->scopes()->where('value', $scope->value)->sole()->getKey(), $scopes));
 }

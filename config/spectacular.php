@@ -1,9 +1,16 @@
 <?php
 declare(strict_types=1);
+use App\Admin\Http\Api\AdminApiScopes;
 use App\Admin\Http\Api\ApiScopes;
+use App\Admin\Http\Api\OpenApi\ApiEndpoints;
+use App\Auth\Http\Api\OpenApi\AuthEndpoints;
+use App\Auth\Http\Api\OpenApi\DiscoveryEndpoints;
+use App\Auth\Http\Api\OpenApi\UserEndpoints;
 
 return [
     'openapi' => [
+        'endpoints' => [ApiEndpoints::class, AuthEndpoints::class, UserEndpoints::class, DiscoveryEndpoints::class],
+
         'validation' => [
             'path' => base_path('openapi.json'),
         ],
@@ -25,7 +32,7 @@ return [
          *  ],
          */
         'info' => [
-            'description' => 'Manage the realms, clients and identities of this Lock instance.',
+            'description' => 'OAuth and OpenID Connect endpoints, discovery metadata, and the APIs for managing this Lock instance. Protocol endpoints are served on each realm’s own host.',
             'license' => ['name' => 'MIT', 'identifier' => 'MIT'],
         ],
 
@@ -89,9 +96,34 @@ return [
         'security' => [
             'middleware' => ['auth', 'auth:*'],
             'schemes' => [
+                'adminOAuth2' => [
+                    'type' => 'oauth2',
+                    'description' => 'A master-realm access token addressed to the Admin API. Request resource={issuer}/admin-api when obtaining the token.',
+                    'flows' => [
+                        'clientCredentials' => [
+                            'token_url' => '/oauth/token',
+                            'scopes' => AdminApiScopes::class,
+                        ],
+                        'authorizationCode' => [
+                            'authorization_url' => '/oauth/authorize',
+                            'token_url' => '/oauth/token',
+                            'scopes' => AdminApiScopes::class,
+                        ],
+                    ],
+                ],
+                'clientSecretBasic' => [
+                    'type' => 'http',
+                    'scheme' => 'basic',
+                    'description' => 'Client credentials for clients registered with client_secret_basic. Form-encode the client ID and secret before constructing the Basic credentials.',
+                ],
+                'protocolBearer' => [
+                    'type' => 'http',
+                    'scheme' => 'bearer',
+                    'description' => 'A user access token issued by this realm with the openid scope.',
+                ],
                 'oauth2' => [
                     'type' => 'oauth2',
-                    'description' => 'An access token of the master realm, addressed to this API through the RFC 8707 `resource` parameter.',
+                    'description' => 'A master-realm access token addressed to the Management API. Request resource={issuer}/api when obtaining the token.',
                     'flows' => [
                         'clientCredentials' => [
                             'token_url' => '/oauth/token',

@@ -26,7 +26,7 @@ beforeEach(function () {
 });
 
 test('an admin adds a provider and only the credentials of its driver are stored', function () {
-    $this->actingAs(globalAdmin())->callAction(CreateSocialProviderAction::class, [
+    $this->actingAs(globalAdminWith(ManagementScope::SocialProvidersWrite))->callAction(CreateSocialProviderAction::class, [
         'key' => '  google  ',
         'driver' => 'google',
         'client_id' => 'client-id',
@@ -154,7 +154,7 @@ test('a submitted secret replaces the stored one without reaching the trail', fu
         'config' => ['client_id' => 'id', 'client_secret' => 'old-secret'],
     ]);
 
-    $this->actingAs(globalAdmin())->submitForm(UpdateSocialProviderForm::class, [
+    $this->actingAs(globalAdminWith(ManagementScope::SocialProvidersWrite))->submitForm(UpdateSocialProviderForm::class, [
         'client_secret' => 'new-secret',
     ], ['realm' => 'acme', 'socialProvider' => $provider->id, 'field' => 'client_secret'])->assertRedirect();
 
@@ -184,7 +184,7 @@ test('deleting a provider unlinks the accounts brokered through it', function ()
 
     SocialAccount::factory()->create(['realm' => 'acme', 'user_id' => $user->id, 'provider' => 'google']);
 
-    $this->actingAs(globalAdmin())
+    $this->actingAs(globalAdminWith(ManagementScope::SocialProvidersWrite))
         ->callAction(DeleteSocialProviderAction::class, [], ['realm' => 'acme', 'socialProvider' => $provider->id])
         ->assertOk();
 
@@ -224,11 +224,11 @@ test('a provider is only reachable through its own realm', function () {
     expect($provider->refresh()->config['client_id'])->not->toBe('taken-over');
 });
 
-test('a realm reader can view providers but cannot change them', function () {
+test('a social provider reader can view providers but cannot change them', function () {
     $provider = RealmSocialProvider::factory()->for($this->realm)->create(['key' => 'google']);
     $context = ['realm' => 'acme', 'socialProvider' => $provider->id];
 
-    $this->actingAs(globalAdminWith(ManagementScope::RealmsRead));
+    $this->actingAs(globalAdminWith(ManagementScope::SocialProvidersRead));
     $this->get("/admin/realms/acme/social-providers/{$provider->id}")->assertOk();
     $this->loadTable(SocialProvidersTable::class, context: ['realm' => 'acme'])->assertOk();
     $this->callDeniedAction(CreateSocialProviderAction::class, ['key' => 'github', 'driver' => 'github'], ['realm' => 'acme'])->assertForbidden();
@@ -252,9 +252,9 @@ test('social policies can be changed through the realm settings form', function 
         ->and($this->other->brokering()->autoProvision)->toBeTrue();
 });
 
-test('provider details and tables require realm read access', function () {
+test('realm access does not grant access to provider details or tables', function () {
     $provider = RealmSocialProvider::factory()->for($this->realm)->create();
-    $this->actingAs(globalAdminWith(ManagementScope::UsersRead));
+    $this->actingAs(globalAdminWith(ManagementScope::RealmsRead));
 
     $this->get("/admin/realms/acme/social-providers/{$provider->id}")->assertForbidden();
     $this->loadDeniedTable(SocialProvidersTable::class, context: ['realm' => 'acme'])->assertForbidden();

@@ -19,6 +19,7 @@ use App\Realms\Ui\Tables\SocialProvidersTable;
 use App\Shared\Ui\Components\ActionBar;
 use App\Shared\Ui\Pages\AdminPage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Lattice\Actions\Components\Action;
 use Lattice\Core\Attributes\AsPage;
 use Lattice\Core\Breadcrumb;
@@ -88,7 +89,7 @@ final class RealmSettingsPage extends AdminPage
         return Tab::make($section->value, __('realms.sections.'.$section->value))
             ->visible($manages || $section === RealmSettingSection::Social)
             ->schema([
-                ...($section === RealmSettingSection::Social ? [$this->socialProvidersCard($manages)] : []),
+                ...($section === RealmSettingSection::Social && Gate::allows(ManagementScope::SocialProvidersRead) ? [$this->socialProvidersCard()] : []),
                 Card::make($section === RealmSettingSection::Social
                     ? __('social-providers.linking.heading')
                     : __('realms.sections.'.$section->value))->schema([
@@ -97,10 +98,10 @@ final class RealmSettingsPage extends AdminPage
             ]);
     }
 
-    private function socialProvidersCard(bool $manages): Card
+    private function socialProvidersCard(): Card
     {
         return Card::make(__('social-providers.heading'), __('social-providers.description'))->schema([
-            ...($manages ? ActionBar::make(primary: [Action::use(CreateSocialProviderAction::class)], key: 'admin-social-providers') : []),
+            ...(Gate::allows(ManagementScope::SocialProvidersWrite) ? ActionBar::make(primary: [Action::use(CreateSocialProviderAction::class)], key: 'admin-social-providers') : []),
             Table::use(SocialProvidersTable::class),
         ]);
     }

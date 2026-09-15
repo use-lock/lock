@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Admin;
 
+use App\Admin\Enums\ApiResource;
 use App\Admin\Enums\BootstrapOutcome;
 use App\Admin\Enums\ManagementScope;
 use App\Realms\Models\Realm;
@@ -16,10 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Lock\Server\Shared\Realms\RealmAudiences;
 
 /**
- * Lock's own management API as an OAuth protected resource: a resource row of
- * the master realm carrying the scopes of {@see ManagementScope}. The rows are real,
- * so the console lists them and a token request resolves them like any other
- * resource, but `app:deploy` owns them and the console refuses to change them.
+ * Deployment-owned OAuth protected resources and scope rows in the master realm.
  */
 final readonly class ManagementApi
 {
@@ -37,27 +35,32 @@ final readonly class ManagementApi
      * The `aud` value a token for this API carries. Only resolvable while the
      * master realm is current, which every request to `api/*` is.
      */
-    public function audience(): string
+    public function audience(ApiResource $resource = ApiResource::Management): string
     {
-        return $this->audiences->protectedResource(self::RESOURCE);
+        return $this->audiences->protectedResource($resource->value);
     }
 
     /** The resource row and its scopes, as the deploy leaves them. */
     public function reconcile(Realm $realm): BootstrapOutcome
     {
         return DB::transaction(function () use ($realm): BootstrapOutcome {
-            $resource = $realm->realmResources()->firstOrNew(['identifier' => self::RESOURCE]);
-            $created = ! $resource->exists;
+            $created = false;
+            $changed = false;
 
-            $resource->name = self::NAME;
-            $changed = $resource->isDirty();
-            $resource->save();
+            foreach (ApiResource::cases() as $api) {
+                $resource = $realm->realmResources()->firstOrNew(['identifier' => $api->value]);
+                $isNew = ! $resource->exists;
+                $resource->name = $api->label();
+                $changed = $resource->isDirty() || $changed;
+                $resource->save();
+                $created = $created || $isNew;
 
-            if ($created) {
-                Audit::record(ResourceAdminEvent::ResourceCreated, $resource, $realm, $this->context($realm));
+                if ($isNew) {
+                    Audit::record(ResourceAdminEvent::ResourceCreated, $resource, $realm, $this->context($realm, $api->value));
+                }
+
+                $changed = $this->reconcileScopes($resource, $realm, $api) || $changed;
             }
-
-            $changed = $this->reconcileScopes($resource, $realm) || $changed;
 
             return match (true) {
                 $created => BootstrapOutcome::Created,
@@ -113,7 +116,7 @@ final readonly class ManagementApi
     /** `app:deploy` owns these rows, so nothing else may rename or delete them. */
     public function owns(Resource $resource): bool
     {
-        return $resource->identifier === self::RESOURCE && $resource->realm->isMaster();
+        return ApiResource::tryFrom($resource->identifier) !== null && $resource->realm->isMaster();
     }
 
     public function ownsScope(ResourceScope $scope): bool
@@ -131,18 +134,20 @@ final readonly class ManagementApi
      */
     private function scopeRows(Realm $realm): array
     {
-        $resource = $realm->realmResources()->where('identifier', self::RESOURCE)->sole();
-
-        return $resource->scopes()->pluck('id', 'value')
-            ->map(fn (mixed $id): string => (string) $id)
+        return $realm->realmResources()
+            ->whereIn('identifier', array_column(ApiResource::cases(), 'value'))
+            ->with('scopes')
+            ->get()
+            ->flatMap(fn (Resource $resource): array => $resource->scopes->all())
+            ->pluck('id', 'value')
             ->all();
     }
 
-    private function reconcileScopes(Resource $resource, Realm $realm): bool
+    private function reconcileScopes(Resource $resource, Realm $realm, ApiResource $api): bool
     {
         $changed = false;
 
-        foreach (ManagementScope::cases() as $scope) {
+        foreach ($api->scopes() as $scope) {
             $row = $resource->scopes()->firstOrNew(['value' => $scope->value]);
             $created = ! $row->exists;
 
@@ -156,17 +161,17 @@ final readonly class ManagementApi
                     $created ? ResourceAdminEvent::ScopeCreated : ResourceAdminEvent::ScopeUpdated,
                     $row,
                     $realm,
-                    [...$this->context($realm), 'value' => $row->value],
+                    [...$this->context($realm, $resource->identifier), 'value' => $row->value],
                 );
             }
         }
 
-        $removed = $resource->scopes()->whereNotIn('value', ManagementScope::values())->get();
+        $removed = $resource->scopes()->whereNotIn('value', $api->values())->get();
 
         foreach ($removed as $row) {
             $row->delete();
 
-            Audit::record(ResourceAdminEvent::ScopeDeleted, $row, $realm, [...$this->context($realm), 'value' => $row->value]);
+            Audit::record(ResourceAdminEvent::ScopeDeleted, $row, $realm, [...$this->context($realm, $resource->identifier), 'value' => $row->value]);
         }
 
         $resource->unsetRelation('scopes');
@@ -175,12 +180,12 @@ final readonly class ManagementApi
     }
 
     /** @return array<string, string> */
-    private function context(Realm $realm): array
+    private function context(Realm $realm, string $resource = self::RESOURCE): array
     {
         return [
             'actor' => 'console:app:bootstrap',
             'realm' => $realm->slug,
-            'resource' => self::RESOURCE,
+            'resource' => $resource,
         ];
     }
 }
