@@ -277,10 +277,11 @@ those values distinguishes the two, so a staging stack can be recreated from scr
 ## Local trial
 
 ```bash
-docker compose --env-file compose.local.env -f compose.yaml -f compose.local.yaml up --build --wait
+docker compose --env-file compose.local.env -f compose.yaml -f compose.local.yaml up -d --pull always --wait
 ```
 
-The `app` container deploys on start. Then open `http://localhost:8080/.well-known/openid-configuration`
+The local overlay uses the public `ghcr.io/use-lock/lock:latest` image from [compose.yaml](../compose.yaml)
+and publishes port `8080`. No local image build is required. The `app` container deploys on start. Then open `http://localhost:8080/.well-known/openid-configuration`
 and its `jwks.json`, which the deploy step has already keyed, and sign in at `http://localhost:8080` with the `LOCK_ADMIN_EMAIL` and `LOCK_ADMIN_PASSWORD`
 from `compose.local.env`. The same file's client id and secret get a machine token:
 
