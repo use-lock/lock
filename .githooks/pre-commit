@@ -34,7 +34,7 @@ split_staged php '*.php'
 split_staged ts '*.ts' '*.tsx' ':(exclude)resources/js/types/sprite-icons.ts'
 # .ai/rules/index.md is excluded here as well as in .prettierignore: oxfmt honours
 # the ignore file, but passing an explicitly named path would override it.
-split_staged md '*.md' ':(exclude).ai/rules/index.md'
+split_staged md '*.md' ':(exclude).ai/rules/index.md' ':(exclude)CHANGELOG.md'
 
 if has "$tmp/fix.php"; then
     printf 'rector + pint (staged PHP)\n'
