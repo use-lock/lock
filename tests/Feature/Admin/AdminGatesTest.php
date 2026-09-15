@@ -28,6 +28,7 @@ test('support holds exactly the scopes its grant lists', function () {
 
     $granted = [
         ManagementScope::RealmsRead,
+        ManagementScope::SocialProvidersRead,
         ManagementScope::UsersRead,
         ManagementScope::UsersWrite,
         ManagementScope::RolesRead,

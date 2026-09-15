@@ -16,6 +16,10 @@ enum ManagementScope: string
 
     case RealmsWrite = 'realms:write';
 
+    case SocialProvidersRead = 'social-providers:read';
+
+    case SocialProvidersWrite = 'social-providers:write';
+
     case UsersRead = 'users:read';
 
     case UsersWrite = 'users:write';
@@ -41,6 +45,8 @@ enum ManagementScope: string
         return match ($this) {
             self::RealmsRead => 'Read realms, their settings and their domain state.',
             self::RealmsWrite => 'Create, rename, re-point, configure and delete realms.',
+            self::SocialProvidersRead => 'Read the social identity providers of a realm.',
+            self::SocialProvidersWrite => 'Create, configure and delete social identity providers.',
             self::UsersRead => 'Read the users of a realm and their sessions.',
             self::UsersWrite => 'Create, edit, block, delete users and end their sessions.',
             self::ClientsRead => 'Read the OAuth clients of a realm.',
@@ -54,12 +60,20 @@ enum ManagementScope: string
         };
     }
 
+    public function apiResource(): ApiResource
+    {
+        return match ($this) {
+            self::RealmsRead, self::RealmsWrite => ApiResource::Admin,
+            default => ApiResource::Management,
+        };
+    }
+
     /** @return array<string, string> */
-    public static function catalog(): array
+    public static function catalog(?ApiResource $resource = null): array
     {
         $catalog = [];
 
-        foreach (self::cases() as $scope) {
+        foreach ($resource?->scopes() ?? self::cases() as $scope) {
             $catalog[$scope->value] = $scope->description();
         }
 
@@ -67,8 +81,8 @@ enum ManagementScope: string
     }
 
     /** @return list<string> */
-    public static function values(): array
+    public static function values(?ApiResource $resource = null): array
     {
-        return array_column(self::cases(), 'value');
+        return array_column($resource?->scopes() ?? self::cases(), 'value');
     }
 }

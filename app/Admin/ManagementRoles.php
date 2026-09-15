@@ -7,7 +7,7 @@ use App\Admin\Enums\ManagementScope;
 
 /**
  * The roles Lock ships with: realm roles of the master realm whose scopes are
- * the management API's. They are ordinary roles otherwise — the console lists
+ * the Admin and Management APIs’. They are ordinary roles otherwise — the console lists
  * and assigns them like any other — but `app:bootstrap` owns their scope sets,
  * so nothing else may rename or delete them.
  *
@@ -29,6 +29,7 @@ final class ManagementRoles
             self::SUPER_ADMIN => ManagementScope::cases(),
             self::SUPPORT => [
                 ManagementScope::RealmsRead,
+                ManagementScope::SocialProvidersRead,
                 ManagementScope::UsersRead,
                 ManagementScope::UsersWrite,
                 ManagementScope::RolesRead,

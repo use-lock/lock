@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Admin\Ui\Remote;
 
+use App\Admin\Enums\ApiResource;
 use App\Admin\Enums\ManagementScope;
 use App\Admin\ManagementApi;
 use App\Realms\Models\Realm;
@@ -39,11 +40,12 @@ final class ApiReferenceTokens extends RemoteSourceDefinition
 
         abort_if($user === null, 403);
 
-        $audience = $this->api->audience();
+        $audience = $request->string('audience')->toString();
+        $resource = array_find(ApiResource::cases(), fn (ApiResource $candidate): bool => $this->api->audience($candidate) === $audience);
 
-        abort_unless($request->string('audience')->toString() === $audience, 403);
+        abort_if($resource === null, 403);
 
-        $scopes = $this->scopes($request);
+        $scopes = $this->scopes($request, $resource);
 
         abort_if($scopes === [], 403);
 
@@ -64,17 +66,18 @@ final class ApiReferenceTokens extends RemoteSourceDefinition
         );
     }
 
-    /**
-     * The sealed reference already pins the scope set; this keeps a scope the
-     * API never declared out of a token even if the document drifts.
-     *
-     * @return list<string>
-     */
-    private function scopes(Request $request): array
+    /** @return list<string> */
+    private function scopes(Request $request, ApiResource $resource): array
     {
-        $requested = array_filter($request->array('scopes'), is_string(...));
+        $scopes = [];
+        foreach ($request->array('scopes') as $value) {
+            abort_unless(is_string($value), 403);
+            $scope = ManagementScope::tryFrom($value);
+            abort_if($scope === null || $scope->apiResource() !== $resource, 403);
+            $scopes[] = $scope->value;
+        }
 
-        return array_values(array_intersect($requested, ManagementScope::values()));
+        return array_values(array_unique($scopes));
     }
 
     private function consoleClientId(): string

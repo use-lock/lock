@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Admin\Http\Middleware;
 
+use App\Admin\Enums\ApiResource;
 use App\Admin\ManagementApi;
 use Closure;
 use Illuminate\Http\Request;
@@ -22,8 +23,8 @@ final readonly class EnsureManagementApiAudience
         private CheckAudience $audience,
     ) {}
 
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, string $resource = ApiResource::Management->value): Response
     {
-        return $this->audience->handle($request, $next, $this->api->audience());
+        return $this->audience->handle($request, $next, $this->api->audience(ApiResource::from($resource)));
     }
 }

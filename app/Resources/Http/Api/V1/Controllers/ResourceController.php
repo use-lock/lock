@@ -67,7 +67,7 @@ final readonly class ResourceController
     /**
      * Update a protected resource
      *
-     * Fields left out retain their values. The management API resource is protected.
+     * Fields left out retain their values. The built-in API resources are protected.
      */
     public function update(UpdateResourceData $data, Realm $realm, string $resource): ResourceData
     {
@@ -81,7 +81,7 @@ final readonly class ResourceController
     /**
      * Delete a resource and its scopes
      *
-     * The management API resource cannot be deleted.
+     * The built-in API resources cannot be deleted.
      */
     public function destroy(Realm $realm, string $resource): SymfonyResponse
     {
@@ -99,6 +99,6 @@ final readonly class ResourceController
 
     private function guardManagementApi(Resource $resource): void
     {
-        abort_if($this->api->owns($resource), SymfonyResponse::HTTP_FORBIDDEN, 'The management API resource cannot be changed.');
+        abort_if($this->api->owns($resource), SymfonyResponse::HTTP_FORBIDDEN, 'Built-in API resources cannot be changed.');
     }
 }

@@ -23,7 +23,7 @@ use Lattice\Table\TableQuery;
 /**
  * @extends EloquentTableDefinition<RealmSocialProvider>
  */
-#[AsTable(self::ID, can: ManagementScope::RealmsRead)]
+#[AsTable(self::ID, can: ManagementScope::SocialProvidersRead)]
 final class SocialProvidersTable extends EloquentTableDefinition
 {
     public const string ID = 'admin.social-providers';
@@ -69,7 +69,7 @@ final class SocialProvidersTable extends EloquentTableDefinition
 
     public function actions(array $row): array
     {
-        if (! Gate::allows(ManagementScope::RealmsWrite)) {
+        if (! Gate::allows(ManagementScope::SocialProvidersWrite)) {
             return [];
         }
 

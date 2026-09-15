@@ -16,7 +16,7 @@ use Lattice\Ui\Enums\Emphasis;
 use Lattice\Ui\Enums\HttpMethod;
 use Lattice\Ui\Enums\Variant;
 
-#[AsAction('admin.social-providers.delete', can: ManagementScope::RealmsWrite)]
+#[AsAction('admin.social-providers.delete', can: ManagementScope::SocialProvidersWrite)]
 final class DeleteSocialProviderAction extends ActionDefinition
 {
     use ResolvesRealmSocialProvider;

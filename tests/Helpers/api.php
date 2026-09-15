@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Helpers;
 
+use App\Admin\Enums\ApiResource;
 use App\Admin\Enums\ManagementScope;
 use App\Admin\ManagementApi;
 use App\Admin\Ui\Pages\ApiReferencePage;
@@ -12,6 +13,7 @@ use App\Realms\Models\Realm;
 use App\Resources\Models\Resource;
 use App\Shared\Audit\Audit;
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 use Lattice\Core\Contracts\SignsComponentReferences;
 use Tests\TestCase;
 
@@ -39,7 +41,7 @@ function managementApiToken(TestCase $test, ManagementScope ...$scopes): string
     return $test->issueClientToken(
         $test->createOidcMachineClient(),
         array_column($scopes, 'value'),
-        [app(ManagementApi::class)->audience()],
+        [app(ManagementApi::class)->audience(apiResourceForScopes(...$scopes))],
     );
 }
 
@@ -53,9 +55,11 @@ function managementApiToken(TestCase $test, ManagementScope ...$scopes): string
  */
 function playgroundTokenRequest(ManagementScope ...$scopes): array
 {
+    $resource = apiResourceForScopes(...$scopes);
+    $nodeId = $resource === ApiResource::Admin ? ApiReferencePage::REFERENCE_ID : ApiReferencePage::MANAGEMENT_REFERENCE_ID;
     $values = array_column($scopes, 'value');
     $context = [
-        'audience' => app(ManagementApi::class)->audience(),
+        'audience' => app(ManagementApi::class)->audience($resource),
         'source' => ApiReferenceTokens::KEY,
         'scopes' => $values,
     ];
@@ -63,13 +67,25 @@ function playgroundTokenRequest(ManagementScope ...$scopes): array
     app()->instance('request', Request::create((string) config('app.url')));
 
     return [
-        'ref' => app(SignsComponentReferences::class)->seal('api-reference', ApiReferencePage::REFERENCE_ID, $context),
+        'ref' => app(SignsComponentReferences::class)->seal('api-reference', $nodeId, $context),
         'endpoint' => route('lattice.remote-sources.token', ['source' => ApiReferenceTokens::KEY], absolute: false),
         'payload' => [
-            'nodeId' => ApiReferencePage::REFERENCE_ID,
+            'nodeId' => $nodeId,
             'nodeType' => 'api-reference',
             'audience' => $context['audience'],
             'scopes' => $values,
         ],
     ];
+}
+
+function apiResourceForScopes(ManagementScope ...$scopes): ApiResource
+{
+    $resource = ($scopes[0] ?? null)?->apiResource() ?? ApiResource::Management;
+    foreach ($scopes as $scope) {
+        if ($scope->apiResource() !== $resource) {
+            throw new InvalidArgumentException('A token cannot combine Admin API and Management API scopes.');
+        }
+    }
+
+    return $resource;
 }

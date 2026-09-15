@@ -21,7 +21,7 @@ final readonly class CreateResourceScope
     public function handle(Resource $resource, CreateResourceScopeData $data): ResourceScope
     {
         if ($this->api->owns($resource)) {
-            throw new LogicException('The management API resource is reconciled by app:deploy and cannot be changed here.');
+            throw new LogicException('Built-in API resources are reconciled by app:deploy and cannot be changed here.');
         }
 
         return DB::transaction(function () use ($resource, $data): ResourceScope {

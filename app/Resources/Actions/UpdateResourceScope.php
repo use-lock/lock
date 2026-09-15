@@ -52,7 +52,7 @@ final readonly class UpdateResourceScope
     private function guardManagementApi(ResourceScope $scope): void
     {
         if ($this->api->ownsScope($scope)) {
-            throw new LogicException('The management API resource is reconciled by app:deploy and cannot be changed here.');
+            throw new LogicException('Built-in API resources are reconciled by app:deploy and cannot be changed here.');
         }
     }
 }

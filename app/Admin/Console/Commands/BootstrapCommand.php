@@ -20,7 +20,7 @@ use RuntimeException;
  * The environment is the source of truth on every run and an unset variable
  * means unmanaged, which keeps this safe to repeat on every deploy.
  */
-#[Description('Reconcile the management API, the protected roles, the console client and the first administrator.')]
+#[Description('Reconcile the Admin and Management APIs, the protected roles, the console client and the first administrator.')]
 #[Signature('app:bootstrap')]
 final class BootstrapCommand extends Command
 {
@@ -30,7 +30,7 @@ final class BootstrapCommand extends Command
             $realm = Realm::master();
             $outcomes = DB::transaction(fn (): array => [
                 'console client' => $this->provisionClient($clients, $realm),
-                'management api' => $api->reconcile($realm),
+                'admin and management apis' => $api->reconcile($realm),
                 'protected roles' => $api->reconcileRoles($realm),
                 'administrator' => $this->ensureAdministrator($administrators),
             ]);

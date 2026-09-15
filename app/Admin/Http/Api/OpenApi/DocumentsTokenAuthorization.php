@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace App\Admin\Http\Api\OpenApi;
 
+use App\Admin\Enums\ApiResource;
+use App\Admin\Enums\ManagementScope;
 use App\Admin\Http\Middleware\EnsureScopes;
 use Dedoc\Scramble\Extensions\OperationExtension;
 use Dedoc\Scramble\Support\Generator\Operation;
@@ -27,6 +29,8 @@ final class DocumentsTokenAuthorization extends OperationExtension
 {
     public const string SCHEME = 'oauth2';
 
+    public const string ADMIN_SCHEME = 'adminOAuth2';
+
     public function handle(Operation $operation, RouteInfo $routeInfo): void
     {
         $scopes = $this->scopesOf($routeInfo);
@@ -35,7 +39,11 @@ final class DocumentsTokenAuthorization extends OperationExtension
             return;
         }
 
-        $operation->security = [new SecurityRequirement([self::SCHEME => $scopes])];
+        $scheme = ManagementScope::from($scopes[0])->apiResource() === ApiResource::Admin
+            ? self::ADMIN_SCHEME
+            : self::SCHEME;
+
+        $operation->security = [new SecurityRequirement([$scheme => $scopes])];
 
         $operation->responses = array_values(array_filter(
             $operation->responses ?? [],

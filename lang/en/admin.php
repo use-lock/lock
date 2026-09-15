@@ -4,6 +4,7 @@ declare(strict_types=1);
 return [
     'api' => [
         'heading' => 'API',
-        'description' => 'The management API of this instance. Execute a request straight from an operation to try it with your own permissions.',
+        'description' => 'Explore the Admin API, Management API and identity protocols. Admin and management requests use separate scoped tokens.',
+        'protocol' => 'Auth, User & Discovery',
     ],
 ];

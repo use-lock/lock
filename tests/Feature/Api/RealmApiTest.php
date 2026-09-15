@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
+use App\Admin\Enums\ApiResource;
 use App\Admin\Enums\ManagementScope;
 use App\Audit\Models\AdminEvent;
 use App\Realms\Enums\RealmAdminEvent;
@@ -116,9 +117,12 @@ it('answers on the master host only', function () {
 it('declares its scopes as the resource a token is addressed to', function () {
     provisionManagementApi();
 
-    $this->getJson(realmUrl(Realm::master(), '/.well-known/oauth-protected-resource/api'))
-        ->assertOk()
-        ->assertJsonPath('scopes_supported', fn (array $scopes): bool => ! array_diff($scopes, ManagementScope::values()) && ! array_diff(ManagementScope::values(), $scopes));
+    foreach (ApiResource::cases() as $resource) {
+        $response = $this->getJson(realmUrl(Realm::master(), '/.well-known/oauth-protected-resource/'.$resource->value))
+            ->assertOk();
+
+        expect($response->json('scopes_supported'))->toEqualCanonicalizing(ManagementScope::values($resource));
+    }
 });
 
 it('reports the realm configuration with every setting typed', function () {
