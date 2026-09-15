@@ -67,6 +67,12 @@
             "Composer\\Config::disableProcessTimeout",
             "@php artisan dev"
         ],
+        "openapi:export": [
+            "@putenv APP_URL=https://lock.example",
+            "@putenv API_VERSION=1.0.0",
+            "@php artisan scramble:export --no-interaction",
+            "npx --no-install oxfmt --write openapi.json"
+        ],
         "lint": [
             "pint --parallel"
         ],
