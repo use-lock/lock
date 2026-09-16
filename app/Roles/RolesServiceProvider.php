@@ -29,7 +29,7 @@ final class RolesServiceProvider extends ServiceProvider
                 ->label(__('navigation.roles'))
                 ->prefix(Affix::icon('shield-check'))
                 ->can(ManagementScope::RolesRead),
-            priority: 30,
+            priority: 40,
         );
 
         Lattice::context('role', fn (string $value): Role => Role::query()->findOrFail($value));

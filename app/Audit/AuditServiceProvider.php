@@ -7,7 +7,6 @@ namespace App\Audit;
 use App\Admin\Enums\ManagementScope;
 use App\Audit\Listeners\RecordAdminEvent;
 use App\Audit\Ui\Pages\AdminEventsPage;
-use App\Audit\Ui\Pages\RealmAdminEventsPage;
 use App\Audit\Ui\Pages\RealmUserEventsPage;
 use App\Realms\Models\Realm;
 use App\Shared\Audit\Events\AdminActionPerformed;
@@ -31,15 +30,6 @@ final class AuditServiceProvider extends ServiceProvider
                 ->prefix(Affix::icon('shield-alert'))
                 ->can(ManagementScope::UserEventsRead),
             priority: 50,
-        );
-
-        Lattice::extend(
-            'admin.sidebar.realm',
-            static fn (Realm $realm): MenuItem => MenuItem::fromPage(RealmAdminEventsPage::class, ['realm' => $realm->slug])
-                ->label(__('navigation.admin-events'))
-                ->prefix(Icon::Clock)
-                ->can(ManagementScope::AdminEventsRead),
-            priority: 60,
         );
 
         Lattice::extend(

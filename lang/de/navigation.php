@@ -9,7 +9,7 @@ return [
     'back-to-app' => 'Mein Konto',
     'account' => 'Konto',
     'all-realms' => 'Alle Realms',
-    'user-events' => 'Benutzer-Ereignisse',
+    'user-events' => 'Ereignisse',
     'realms' => 'Realms',
     'resources' => 'Resources',
     'roles' => 'Rollen',

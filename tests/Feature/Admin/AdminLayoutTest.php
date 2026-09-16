@@ -29,6 +29,6 @@ it('turns the sidebar into the selected realm console, showing only what the adm
     expect(menuItemHrefs(latticeSchema($response, 'props.lattice.layout.schema')->firstOfTypeOrFail('menu', 'admin-sidebar-menu')))
         ->toBe(array_map(fn (string $area): string => "/admin/realms/acme/{$area}", $areas));
 })->with([
-    'super admin' => [ManagementRoles::SUPER_ADMIN, ['users', 'clients', 'roles', 'resources', 'user-events', 'admin-events', 'settings']],
+    'super admin' => [ManagementRoles::SUPER_ADMIN, ['resources', 'clients', 'users', 'roles', 'user-events', 'settings']],
     'support admin' => [ManagementRoles::SUPPORT, ['users', 'roles', 'user-events', 'settings']],
 ]);

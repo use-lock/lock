@@ -71,7 +71,7 @@ final class AuthServiceProvider extends ServiceProvider
                 ->label(__('navigation.users'))
                 ->prefix(Affix::icon('users'))
                 ->can(ManagementScope::UsersRead),
-            priority: 10,
+            priority: 30,
         );
 
         Auth::provider('realm-eloquent', fn ($app, array $config): RealmUserProvider => new RealmUserProvider(

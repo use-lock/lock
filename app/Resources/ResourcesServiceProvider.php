@@ -35,7 +35,7 @@ final class ResourcesServiceProvider extends ServiceProvider
                 ->label(__('navigation.resources'))
                 ->prefix(Affix::icon('layers'))
                 ->can(ManagementScope::ResourcesRead),
-            priority: 40,
+            priority: 10,
         );
 
         Lattice::context('resource', fn (string $value): Resource => Resource::query()->findOrFail($value));
