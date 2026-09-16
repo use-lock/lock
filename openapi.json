@@ -278,7 +278,7 @@
                         "adminOAuth2": ["realms:read"]
                     }
                 ],
-                "x-internal": true
+                "x-group": "admin"
             },
             "post": {
                 "operationId": "v1.realms.store",
@@ -365,7 +365,7 @@
                         "adminOAuth2": ["realms:write"]
                     }
                 ],
-                "x-internal": true
+                "x-group": "admin"
             }
         },
         "/v1/realms/{realm}": {
@@ -454,7 +454,7 @@
                         "adminOAuth2": ["realms:read"]
                     }
                 ],
-                "x-internal": true
+                "x-group": "admin"
             },
             "put": {
                 "operationId": "v1.realms.update",
@@ -554,7 +554,7 @@
                         "adminOAuth2": ["realms:write"]
                     }
                 ],
-                "x-internal": true
+                "x-group": "admin"
             },
             "patch": {
                 "operationId": "api.v1.realms.update.patch",
@@ -654,7 +654,7 @@
                         "adminOAuth2": ["realms:write"]
                     }
                 ],
-                "x-internal": true
+                "x-group": "admin"
             },
             "delete": {
                 "operationId": "v1.realms.destroy",
@@ -749,7 +749,7 @@
                         "adminOAuth2": ["realms:write"]
                     }
                 ],
-                "x-internal": true
+                "x-group": "admin"
             }
         },
         "/v1/realms/{realm}/social-providers": {
@@ -997,7 +997,7 @@
                         "oauth2": ["social-providers:read"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "post": {
                 "operationId": "v1.realms.social-providers.store",
@@ -1096,7 +1096,7 @@
                         "oauth2": ["social-providers:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             }
         },
         "/v1/realms/{realm}/social-providers/{social_provider}": {
@@ -1192,7 +1192,7 @@
                         "oauth2": ["social-providers:read"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "put": {
                 "operationId": "v1.realms.social-providers.update",
@@ -1298,7 +1298,7 @@
                         "oauth2": ["social-providers:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "patch": {
                 "operationId": "api.v1.realms.social-providers.update.patch",
@@ -1404,7 +1404,7 @@
                         "oauth2": ["social-providers:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "delete": {
                 "operationId": "v1.realms.social-providers.destroy",
@@ -1485,7 +1485,7 @@
                         "oauth2": ["social-providers:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             }
         },
         "/v1/realms/{realm}/clients": {
@@ -1742,7 +1742,7 @@
                         "oauth2": ["clients:read"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "post": {
                 "operationId": "v1.realms.clients.store",
@@ -1843,7 +1843,7 @@
                         "oauth2": ["clients:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             }
         },
         "/v1/realms/{realm}/clients/{client}": {
@@ -1940,7 +1940,7 @@
                         "oauth2": ["clients:read"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "put": {
                 "operationId": "v1.realms.clients.update",
@@ -2048,7 +2048,7 @@
                         "oauth2": ["clients:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "patch": {
                 "operationId": "api.v1.realms.clients.update.patch",
@@ -2156,7 +2156,7 @@
                         "oauth2": ["clients:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "delete": {
                 "operationId": "v1.realms.clients.destroy",
@@ -2239,7 +2239,7 @@
                         "oauth2": ["clients:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             }
         },
         "/v1/realms/{realm}/clients/{client}/secret": {
@@ -2338,7 +2338,7 @@
                         "oauth2": ["clients:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             }
         },
         "/v1/realms/{realm}/clients/{client}/rotate-secret": {
@@ -2437,7 +2437,7 @@
                         "oauth2": ["clients:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             }
         },
         "/v1/realms/{realm}/resources": {
@@ -2673,7 +2673,7 @@
                         "oauth2": ["resources:read"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "post": {
                 "operationId": "v1.realms.resources.store",
@@ -2773,7 +2773,7 @@
                         "oauth2": ["resources:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             }
         },
         "/v1/realms/{realm}/resources/{resource}": {
@@ -2870,7 +2870,7 @@
                         "oauth2": ["resources:read"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "put": {
                 "operationId": "v1.realms.resources.update",
@@ -2978,7 +2978,7 @@
                         "oauth2": ["resources:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "patch": {
                 "operationId": "api.v1.realms.resources.update.patch",
@@ -3086,7 +3086,7 @@
                         "oauth2": ["resources:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             },
             "delete": {
                 "operationId": "v1.realms.resources.destroy",
@@ -3169,7 +3169,7 @@
                         "oauth2": ["resources:write"]
                     }
                 ],
-                "x-internal": false
+                "x-group": "management"
             }
         },
         "/oauth/token": {
@@ -3263,6 +3263,7 @@
                 ],
                 "summary": "Issue or exchange tokens",
                 "description": "Use the realm host as the issuer. Authenticate with the client\u2019s registered method: HTTP Basic (URL-encode the identifier and secret before Base64 encoding), client_id/client_secret in the form, or client_id alone for public clients. Do not combine Basic and a form secret. Token exchange requires realm support and an eligible confidential or trusted first-party client.",
+                "x-group": "auth",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3351,7 +3352,8 @@
                     }
                 ],
                 "summary": "Inspect a token",
-                "description": "Requires a confidential client using its registered client_secret_basic or client_secret_post method. Unknown, expired, revoked and inaccessible tokens return active: false."
+                "description": "Requires a confidential client using its registered client_secret_basic or client_secret_post method. Unknown, expired, revoked and inaccessible tokens return active: false.",
+                "x-group": "auth"
             }
         },
         "/oauth/revoke": {
@@ -3423,7 +3425,8 @@
                     }
                 ],
                 "summary": "Revoke a token",
-                "description": "Authenticate with the registered Basic, form-secret or public-client method. Unknown tokens and tokens owned by another client also return an empty success response."
+                "description": "Authenticate with the registered Basic, form-secret or public-client method. Unknown tokens and tokens owned by another client also return an empty success response.",
+                "x-group": "auth"
             }
         },
         "/oauth/register": {
@@ -3466,6 +3469,7 @@
                 ],
                 "summary": "Register an OAuth client",
                 "description": "Dynamic client registration must be enabled for the realm. Registers authorization-code clients, optionally with refresh tokens. Unknown metadata is ignored.",
+                "x-group": "auth",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3540,6 +3544,7 @@
                 ],
                 "summary": "Authorize a client",
                 "description": "Browser authorization-code flow with S256 PKCE. Uses the identity session and may redirect to sign-in, required actions or consent. Success redirects to the registered callback with code, iss and the original state. After validating the client and callback, protocol errors also redirect there with error, error_description, iss and state. request and request_uri are unsupported; only response_mode=query is supported. POST requires the browser\u2019s CSRF token.",
+                "x-group": "auth",
                 "parameters": [
                     {
                         "name": "client_id",
@@ -3745,6 +3750,7 @@
                 ],
                 "summary": "Authorize a client",
                 "description": "Browser authorization-code flow with S256 PKCE. Uses the identity session and may redirect to sign-in, required actions or consent. Success redirects to the registered callback with code, iss and the original state. After validating the client and callback, protocol errors also redirect there with error, error_description, iss and state. request and request_uri are unsupported; only response_mode=query is supported. POST requires the browser\u2019s CSRF token.",
+                "x-group": "auth",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -3819,6 +3825,7 @@
                 ],
                 "summary": "End the identity session",
                 "description": "Browser logout, optionally with a confirmation page. A post-logout redirect is used only when registered to the identified client; state is echoed on that redirect. Invalid ID token hints are ignored. POST requires the browser\u2019s CSRF token.",
+                "x-group": "auth",
                 "parameters": [
                     {
                         "name": "id_token_hint",
@@ -3941,6 +3948,7 @@
                 ],
                 "summary": "End the identity session",
                 "description": "Browser logout, optionally with a confirmation page. A post-logout redirect is used only when registered to the identified client; state is echoed on that redirect. Invalid ID token hints are ignored. POST requires the browser\u2019s CSRF token.",
+                "x-group": "auth",
                 "requestBody": {
                     "required": false,
                     "content": {
@@ -4005,6 +4013,7 @@
                 ],
                 "summary": "Approve authorization consent",
                 "description": "Browser consent submission. Requires the signed-in identity session, its CSRF token and the single-use auth_token from the consent page. Approval redirects with an authorization code; denial redirects with access_denied.",
+                "x-group": "auth",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -4067,6 +4076,7 @@
                 ],
                 "summary": "Deny authorization consent",
                 "description": "Browser consent submission. Requires the signed-in identity session, its CSRF token and the single-use auth_token from the consent page. Approval redirects with an authorization code; denial redirects with access_denied.",
+                "x-group": "auth",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -4141,7 +4151,8 @@
                     }
                 ],
                 "summary": "Read the authenticated user\u2019s claims",
-                "description": "Send a user access token in the Authorization: Bearer header. The token must include the openid scope. Service tokens are rejected. Additional claims depend on the granted scopes and the realm\u2019s claim resolvers. Compare sub with the ID token\u2019s subject."
+                "description": "Send a user access token in the Authorization: Bearer header. The token must include the openid scope. Service tokens are rejected. Additional claims depend on the granted scopes and the realm\u2019s claim resolvers. Compare sub with the ID token\u2019s subject.",
+                "x-group": "auth"
             },
             "post": {
                 "operationId": "oidc.userinfo.post",
@@ -4204,7 +4215,8 @@
                     }
                 ],
                 "summary": "Read the authenticated user\u2019s claims",
-                "description": "Send a user access token in the Authorization: Bearer header. The token must include the openid scope. Service tokens are rejected. Additional claims depend on the granted scopes and the realm\u2019s claim resolvers. Compare sub with the ID token\u2019s subject."
+                "description": "Send a user access token in the Authorization: Bearer header. The token must include the openid scope. Service tokens are rejected. Additional claims depend on the granted scopes and the realm\u2019s claim resolvers. Compare sub with the ID token\u2019s subject.",
+                "x-group": "auth"
             }
         },
         "/.well-known/openid-configuration": {
@@ -4238,7 +4250,8 @@
                     }
                 ],
                 "summary": "Discover provider capabilities",
-                "description": "The request host selects the realm. Endpoint URLs, scopes and optional capabilities describe that realm. The registration endpoint is advertised only when dynamic registration is enabled."
+                "description": "The request host selects the realm. Endpoint URLs, scopes and optional capabilities describe that realm. The registration endpoint is advertised only when dynamic registration is enabled.",
+                "x-group": "auth"
             }
         },
         "/.well-known/oauth-authorization-server": {
@@ -4273,6 +4286,7 @@
                 ],
                 "summary": "Discover provider capabilities",
                 "description": "The request host selects the realm. Endpoint URLs, scopes and optional capabilities describe that realm. The registration endpoint is advertised only when dynamic registration is enabled.",
+                "x-group": "auth",
                 "parameters": []
             }
         },
@@ -4318,7 +4332,8 @@
                     }
                 ],
                 "summary": "Discover provider capabilities",
-                "description": "The request host selects the realm. Endpoint URLs, scopes and optional capabilities describe that realm. The registration endpoint is advertised only when dynamic registration is enabled."
+                "description": "The request host selects the realm. Endpoint URLs, scopes and optional capabilities describe that realm. The registration endpoint is advertised only when dynamic registration is enabled.",
+                "x-group": "auth"
             }
         },
         "/.well-known/jwks.json": {
@@ -4352,7 +4367,8 @@
                     }
                 ],
                 "summary": "Get public signing keys",
-                "description": "Public RSA keys for validating tokens issued by this realm."
+                "description": "Public RSA keys for validating tokens issued by this realm.",
+                "x-group": "auth"
             }
         },
         "/.well-known/oauth-protected-resource": {
@@ -4390,6 +4406,7 @@
                 ],
                 "summary": "Discover a protected resource",
                 "description": "Discover a configured resource at the issuer root or a path relative to it. Unknown resources return 404.",
+                "x-group": "auth",
                 "parameters": []
             }
         },
@@ -4438,7 +4455,8 @@
                     }
                 ],
                 "summary": "Discover a protected resource",
-                "description": "Discover a configured resource at the issuer root or a path relative to it. Unknown resources return 404."
+                "description": "Discover a configured resource at the issuer root or a path relative to it. Unknown resources return 404.",
+                "x-group": "auth"
             }
         }
     },

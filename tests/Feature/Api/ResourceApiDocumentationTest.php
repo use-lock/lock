@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Admin\Enums\ManagementScope;
-use Bambamboole\Spectacular\OpenApi\PublicOpenApiDocument;
+use Bambamboole\Spectacular\OpenApi\GroupedOpenApiDocuments;
 use Dedoc\Scramble\Generator;
 
 it('documents resource operations and nested scope commands for the playground', function () {
@@ -52,15 +52,34 @@ it('documents resource operations and nested scope commands for the playground',
         ->and($document['components']['schemas']['UpdateResourceData']['properties']['scopes']['items']['$ref'])->toBe('#/components/schemas/ResourceScopeChangeData');
 });
 
-it('publishes management and protocol operations while keeping realm administration internal', function () {
+it('separates admin management and auth documentation', function () {
     $document = app(Generator::class)();
-    $public = PublicOpenApiDocument::create($document) ?? throw new RuntimeException('The API must produce a public document.');
+    $groups = GroupedOpenApiDocuments::create($document);
+
+    expect($groups)->toHaveKeys(['admin', 'auth', 'management'])->toHaveCount(3);
+
+    foreach ($document['paths'] as $path => $operations) {
+        foreach ($operations as $method => $operation) {
+            if (! in_array($method, ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'], true)) {
+                continue;
+            }
+
+            $group = str_starts_with($path, '/v1/')
+                ? (in_array($path, ['/v1/realms', '/v1/realms/{realm}'], true) ? 'admin' : 'management')
+                : 'auth';
+
+            expect($operation['x-group'] ?? null)->toBe($group)
+                ->and($groups[$group]['paths'][$path][$method] ?? null)->toBe($operation);
+        }
+    }
 
     expect($document['paths']['/v1/realms']['get']['security'])
         ->toBe([['adminOAuth2' => ['realms:read']]])
-        ->and($document['paths']['/v1/realms']['get']['x-internal'])->toBeTrue()
-        ->and($public['paths'] ?? [])->not->toHaveKeys(['/v1/realms', '/v1/realms/{realm}'])
-        ->toHaveKeys(['/v1/realms/{realm}/clients', '/v1/realms/{realm}/resources', '/v1/realms/{realm}/social-providers', '/oauth/token', '/oauth/userinfo', '/.well-known/openid-configuration'])
+        ->and($groups['admin']['paths'])->toHaveKeys(['/v1/realms', '/v1/realms/{realm}'])->toHaveCount(2)
+        ->and($groups['management']['paths'])->toHaveKeys(['/v1/realms/{realm}/clients', '/v1/realms/{realm}/resources', '/v1/realms/{realm}/social-providers'])
+        ->not->toHaveKeys(['/v1/realms', '/oauth/token'])
+        ->and($groups['auth']['paths'])->toHaveKeys(['/oauth/token', '/oauth/userinfo', '/.well-known/openid-configuration'])
+        ->not->toHaveKeys(['/v1/realms', '/v1/realms/{realm}/clients'])
         ->and($document['components']['securitySchemes']['adminOAuth2']['flows']['clientCredentials']['scopes'])
         ->toHaveKeys(['realms:read', 'realms:write'])->toHaveCount(2)
         ->and($document['components']['securitySchemes']['oauth2']['flows']['clientCredentials']['scopes'])

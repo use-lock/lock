@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "146710a4a7565c9d8e302c81b0e6eca5",
+    "content-hash": "951f3000c670dbcc17f3b7c1d83466c0",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -196,16 +196,16 @@
         },
         {
             "name": "bambamboole/spectacular",
-            "version": "0.28.0",
+            "version": "0.29.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/bambamboole/spectacular.git",
-                "reference": "2346e9e28326375a39d7d8d2dbb0a4d75769811d"
+                "reference": "58558a65ebe619b7748cb771d86318b5af8c3d64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/bambamboole/spectacular/zipball/2346e9e28326375a39d7d8d2dbb0a4d75769811d",
-                "reference": "2346e9e28326375a39d7d8d2dbb0a4d75769811d",
+                "url": "https://api.github.com/repos/bambamboole/spectacular/zipball/58558a65ebe619b7748cb771d86318b5af8c3d64",
+                "reference": "58558a65ebe619b7748cb771d86318b5af8c3d64",
                 "shasum": ""
             },
             "require": {
@@ -270,9 +270,9 @@
             ],
             "support": {
                 "issues": "https://github.com/bambamboole/spectacular/issues",
-                "source": "https://github.com/bambamboole/spectacular/tree/0.28.0"
+                "source": "https://github.com/bambamboole/spectacular/tree/0.29.0"
             },
-            "time": "2026-09-15T12:03:15+00:00"
+            "time": "2026-09-15T18:56:43+00:00"
         },
         {
             "name": "brick/math",
