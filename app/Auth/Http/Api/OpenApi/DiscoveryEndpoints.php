@@ -14,6 +14,7 @@ final class DiscoveryEndpoints implements EndpointDefinition
         $metadata = [
             'summary' => 'Discover provider capabilities',
             'description' => 'The request host selects the realm. Endpoint URLs, scopes and optional capabilities describe that realm. The registration endpoint is advertised only when dynamic registration is enabled.',
+            'x-group' => 'auth',
             'tags' => ['Discovery'],
             'security' => [],
             'requestBody' => null,
@@ -32,12 +33,14 @@ final class DiscoveryEndpoints implements EndpointDefinition
             Endpoint::route('oidc.jwks', 'get', [
                 'summary' => 'Get public signing keys',
                 'description' => 'Public RSA keys for validating tokens issued by this realm.',
+                'x-group' => 'auth',
                 'tags' => ['Discovery'], 'security' => [], 'requestBody' => null,
                 'responses' => [200 => ProtocolDocumentation::response('JSON Web Key Set.', 'OidcJwks') + ['headers' => $cache]],
             ]),
             Endpoint::route('oidc.protected-resource', 'get', [
                 'summary' => 'Discover a protected resource',
                 'description' => 'Discover a configured resource at the issuer root or a path relative to it. Unknown resources return 404.',
+                'x-group' => 'auth',
                 'tags' => ['Discovery'], 'security' => [], 'requestBody' => null,
                 'parameters' => [[
                     'in' => 'path', 'name' => 'path', 'required' => true,

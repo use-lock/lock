@@ -8,6 +8,7 @@ use App\Admin\Enums\ManagementScope;
 use App\Admin\ManagementApi;
 use App\Admin\Ui\Remote\ApiReferenceTokens;
 use App\Shared\Ui\Pages\AdminPage;
+use Bambamboole\Spectacular\OpenApi\GroupedOpenApiDocuments;
 use Dedoc\Scramble\CacheableGenerator;
 use Lattice\ApiReference\ApiReference;
 use Lattice\Core\Attributes\AsPage;
@@ -29,7 +30,7 @@ final class ApiReferencePage extends AdminPage
 
     public function render(PageSchema $schema, CacheableGenerator $generator, ManagementApi $api): PageSchema
     {
-        $document = $generator();
+        $documents = GroupedOpenApiDocuments::create($generator());
 
         return $schema->schema([
             $this->stack(
@@ -41,46 +42,25 @@ final class ApiReferencePage extends AdminPage
                         Tab::make('admin', ApiResource::Admin->label())->schema([
                             ApiReference::make(self::REFERENCE_ID)
                                 ->id(self::REFERENCE_ID)
-                                ->spec($this->documentFor($document, ['Admin API']))
+                                ->spec($documents['admin'])
                                 ->hideHeader()
                                 ->tokenSource(ApiReferenceTokens::KEY, audience: $api->audience(ApiResource::Admin)),
                         ]),
                         Tab::make('management', ApiResource::Management->label())->schema([
                             ApiReference::make(self::MANAGEMENT_REFERENCE_ID)
                                 ->id(self::MANAGEMENT_REFERENCE_ID)
-                                ->spec($this->documentFor($document, ['Management API']))
+                                ->spec($documents['management'])
                                 ->hideHeader()
                                 ->tokenSource(ApiReferenceTokens::KEY, audience: $api->audience(ApiResource::Management)),
                         ]),
                         Tab::make('protocol', __('admin.api.protocol'))->schema([
                             ApiReference::make('protocol-api-reference')
-                                ->spec($this->documentFor($document, ['Auth', 'User', 'Discovery']))
+                                ->spec($documents['auth'])
                                 ->hideHeader(),
                         ]),
                     ]),
                 ],
             ),
         ]);
-    }
-
-    /**
-     * @param  array<string, mixed>  $document
-     * @param  list<string>  $tags
-     * @return array<string, mixed>
-     */
-    private function documentFor(array $document, array $tags): array
-    {
-        $paths = [];
-        foreach ($document['paths'] ?? [] as $path => $operations) {
-            foreach ($operations as $method => $operation) {
-                if (in_array($method, ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'], true)
-                    && array_intersect($operation['tags'] ?? [], $tags) !== []) {
-                    $paths[$path][$method] = $operation;
-                }
-            }
-        }
-        $document['paths'] = $paths;
-
-        return $document;
     }
 }

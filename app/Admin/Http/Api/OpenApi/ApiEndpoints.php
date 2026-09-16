@@ -31,7 +31,7 @@ final readonly class ApiEndpoints implements EndpointDefinition
             ], true) ? 'Admin API' : 'Management API';
 
             foreach (array_diff($route->methods(), ['HEAD']) as $method) {
-                $endpoints[] = Endpoint::route($name, $method, ['tags' => [$category], 'x-internal' => $category === 'Admin API']);
+                $endpoints[] = Endpoint::route($name, $method, ['tags' => [$category], 'x-group' => $category === 'Admin API' ? 'admin' : 'management']);
             }
         }
 

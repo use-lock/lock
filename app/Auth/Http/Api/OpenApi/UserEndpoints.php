@@ -13,6 +13,7 @@ final class UserEndpoints implements EndpointDefinition
         $operation = [
             'summary' => 'Read the authenticated user’s claims',
             'description' => 'Send a user access token in the Authorization: Bearer header. The token must include the openid scope. Service tokens are rejected. Additional claims depend on the granted scopes and the realm’s claim resolvers. Compare sub with the ID token’s subject.',
+            'x-group' => 'auth',
             'tags' => ['User'],
             'security' => [['protocolBearer' => []]],
             'requestBody' => null,

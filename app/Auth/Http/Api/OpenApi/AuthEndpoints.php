@@ -15,6 +15,7 @@ final class AuthEndpoints implements EndpointDefinition
             Endpoint::route('oidc.token', 'post', [
                 'summary' => 'Issue or exchange tokens',
                 'description' => 'Use the realm host as the issuer. Authenticate with the client’s registered method: HTTP Basic (URL-encode the identifier and secret before Base64 encoding), client_id/client_secret in the form, or client_id alone for public clients. Do not combine Basic and a form secret. Token exchange requires realm support and an eligible confidential or trusted first-party client.',
+                'x-group' => 'auth',
                 'tags' => ['Auth'],
                 'security' => [['clientSecretBasic' => []], new stdClass],
                 'requestBody' => ProtocolDocumentation::body('OAuthTokenRequest'),
@@ -31,6 +32,7 @@ final class AuthEndpoints implements EndpointDefinition
             Endpoint::route('oidc.introspect', 'post', [
                 'summary' => 'Inspect a token',
                 'description' => 'Requires a confidential client using its registered client_secret_basic or client_secret_post method. Unknown, expired, revoked and inaccessible tokens return active: false.',
+                'x-group' => 'auth',
                 'tags' => ['Auth'],
                 'security' => [['clientSecretBasic' => []], new stdClass],
                 'requestBody' => ProtocolDocumentation::body('OAuthPresentedToken'),
@@ -39,6 +41,7 @@ final class AuthEndpoints implements EndpointDefinition
             Endpoint::route('oidc.revoke', 'post', [
                 'summary' => 'Revoke a token',
                 'description' => 'Authenticate with the registered Basic, form-secret or public-client method. Unknown tokens and tokens owned by another client also return an empty success response.',
+                'x-group' => 'auth',
                 'tags' => ['Auth'],
                 'security' => [['clientSecretBasic' => []], new stdClass],
                 'requestBody' => ProtocolDocumentation::body('OAuthPresentedToken'),
@@ -47,6 +50,7 @@ final class AuthEndpoints implements EndpointDefinition
             Endpoint::route('oidc.register', 'post', [
                 'summary' => 'Register an OAuth client',
                 'description' => 'Dynamic client registration must be enabled for the realm. Registers authorization-code clients, optionally with refresh tokens. Unknown metadata is ignored.',
+                'x-group' => 'auth',
                 'tags' => ['Auth'],
                 'security' => [],
                 'requestBody' => ProtocolDocumentation::body('OAuthClientRegistration', 'application/json'),
@@ -65,6 +69,7 @@ final class AuthEndpoints implements EndpointDefinition
             $authorize = [
                 'summary' => 'Authorize a client',
                 'description' => 'Browser authorization-code flow with S256 PKCE. Uses the identity session and may redirect to sign-in, required actions or consent. Success redirects to the registered callback with code, iss and the original state. After validating the client and callback, protocol errors also redirect there with error, error_description, iss and state. request and request_uri are unsupported; only response_mode=query is supported. POST requires the browser’s CSRF token.',
+                'x-group' => 'auth',
                 'tags' => ['Auth'],
                 'security' => [],
                 'responses' => ProtocolDocumentation::browserResponses(),
@@ -72,6 +77,7 @@ final class AuthEndpoints implements EndpointDefinition
             $logout = [
                 'summary' => 'End the identity session',
                 'description' => 'Browser logout, optionally with a confirmation page. A post-logout redirect is used only when registered to the identified client; state is echoed on that redirect. Invalid ID token hints are ignored. POST requires the browser’s CSRF token.',
+                'x-group' => 'auth',
                 'tags' => ['Auth'],
                 'security' => [],
                 'responses' => ProtocolDocumentation::browserResponses(),
@@ -98,6 +104,7 @@ final class AuthEndpoints implements EndpointDefinition
             $endpoints[] = Endpoint::route($route, $method, [
                 'summary' => $method === 'post' ? 'Approve authorization consent' : 'Deny authorization consent',
                 'description' => 'Browser consent submission. Requires the signed-in identity session, its CSRF token and the single-use auth_token from the consent page. Approval redirects with an authorization code; denial redirects with access_denied.',
+                'x-group' => 'auth',
                 'tags' => ['Auth'],
                 'security' => [],
                 'requestBody' => ProtocolDocumentation::body('OAuthConsentRequest'),

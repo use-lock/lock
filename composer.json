@@ -13,7 +13,7 @@
     "require": {
         "php": "^8.5",
         "bambamboole/laravel-i18next": "^0.6.0",
-        "bambamboole/spectacular": "^0.28.0",
+        "bambamboole/spectacular": "^0.29.0",
         "inertiajs/inertia-laravel": "^3.3.4",
         "laravel/framework": "^13.31.0",
         "laravel/octane": "^2.19.1",
@@ -71,7 +71,7 @@
             "@putenv APP_URL=https://lock.example",
             "@putenv API_VERSION=1.0.0",
             "@php artisan spectacular:openapi --path=openapi.json --no-interaction",
-            "npx --no-install oxfmt --write openapi.json openapi.public.json"
+            "npx --no-install oxfmt --write openapi.json openapi.admin.json openapi.auth.json openapi.management.json"
         ],
         "lint": [
             "pint --parallel"
