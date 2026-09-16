@@ -27,8 +27,9 @@ token has no person and is judged on its scopes alone (see `.ai/rules/enums.md`)
 
 The API is the master realm's own protected resource. `App\Admin` owns it: `ManagementScope` is the scope catalog,
 `ManagementApi` reconciles the resource row and its scopes (from `app:bootstrap`, so every deploy restores them) and
-answers which rows the console must refuse to touch. `EnsureManagementApiAudience` narrows every token to that
-resource, because the guard only checks a token is addressed to _one_ of the realm's audiences. The scopes each
+answers which rows the console must refuse to touch. Each route group narrows its tokens to one `ApiResource` with
+the package's `CheckAudience::using(ApiResource::…)`, because the guard only checks a token is addressed to _one_ of
+the realm's audiences; the relative identifier resolves under the issuer at request time. The scopes each
 operation requires reach the OpenAPI document through `DocumentsTokenAuthorization`, which reads them off the route's
 `EnsureScopes` middleware and replaces Scramble's inferred `AuthenticationException` with the RFC 6750 error body the
 guard really returns. The reference's playground mints a token per operation scope set from exactly those scopes, so
