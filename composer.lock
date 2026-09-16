@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "951f3000c670dbcc17f3b7c1d83466c0",
+    "content-hash": "95dde6c5e6b381c808081d514f6a35be",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -10193,16 +10193,16 @@
         },
         {
             "name": "use-lock/server",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/use-lock/server.git",
-                "reference": "9b45de624276cb61d8a523d972a95675eea646eb"
+                "reference": "f5bd11ae7855c386304dd47410151a7f7176aa12"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/use-lock/server/zipball/9b45de624276cb61d8a523d972a95675eea646eb",
-                "reference": "9b45de624276cb61d8a523d972a95675eea646eb",
+                "url": "https://api.github.com/repos/use-lock/server/zipball/f5bd11ae7855c386304dd47410151a7f7176aa12",
+                "reference": "f5bd11ae7855c386304dd47410151a7f7176aa12",
                 "shasum": ""
             },
             "require": {
@@ -10289,7 +10289,7 @@
                 "issues": "https://github.com/use-lock/server/issues",
                 "source": "https://github.com/use-lock/server"
             },
-            "time": "2026-09-14T11:56:36+00:00"
+            "time": "2026-09-16T14:59:39+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

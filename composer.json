@@ -23,7 +23,7 @@
         "sentry/sentry-laravel": "^4.27",
         "spatie/laravel-data": "^4.23",
         "use-lock/client-laravel": "^0.1.0",
-        "use-lock/server": "^0.1.0"
+        "use-lock/server": "^0.2.0"
     },
     "require-dev": {
         "driftingly/rector-laravel": "^2.6.2",
