@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 
+use App\Admin\Enums\ApiResource;
 use App\Admin\Enums\ManagementScope;
+use App\Admin\ManagementApi;
 use App\Auth\Enums\UserAdminEvent;
 use App\Auth\Models\User;
 use App\Realms\Models\Realm;
@@ -12,7 +14,9 @@ use Illuminate\Support\Facades\Notification;
 use Lock\Server\Authentication\Models\PasswordResetToken;
 use Lock\Server\Clients\Models\Client;
 
+use function Tests\Helpers\jwtClaims;
 use function Tests\Helpers\realmRoute;
+use function Tests\Helpers\realmUrl;
 
 beforeEach(function () {
 
@@ -24,11 +28,45 @@ beforeEach(function () {
         'lock.admin.password' => 'CorrectHorse42',
     ]);
 
-    $this->tokenRequest = fn (string $secret) => $this->post(realmRoute('admin', 'oidc.token'), [
+    $this->tokenRequest = fn (string $secret, array $payload = []) => $this->post(realmRoute('admin', 'oidc.token'), [
         'grant_type' => 'client_credentials',
         'client_id' => 'lock-console',
         'client_secret' => $secret,
+        ...$payload,
     ]);
+});
+
+it('lets the console client obtain a token for each API it manages', function (ApiResource $resource, ManagementScope $scope, string $path) {
+    $this->artisan('app:bootstrap')->assertSuccessful();
+
+    $audience = app(ManagementApi::class)->audience($resource);
+
+    $response = ($this->tokenRequest)('console-secret', ['resource' => $audience, 'scope' => $scope->value])->assertOk();
+
+    expect(jwtClaims($response->json('access_token'))['aud'])->toBe($audience)
+        ->and($response->json('scope'))->toBe($scope->value);
+
+    $this->withToken($response->json('access_token'))
+        ->getJson(realmUrl(Realm::master(), $path))
+        ->assertOk();
+})->with([
+    'Admin API' => [ApiResource::Admin, ManagementScope::RealmsRead, '/api/v1/realms'],
+    'Management API' => [ApiResource::Management, ManagementScope::ClientsRead, '/api/v1/realms/admin/clients'],
+]);
+
+it('grants the console client every scope of both APIs and no other resource', function () {
+    $this->artisan('app:bootstrap')->assertSuccessful();
+
+    $api = app(ManagementApi::class);
+    $client = Client::query()->where('client_id', 'lock-console')->sole()->snapshot();
+
+    expect($client->allowedAudiences)->toEqualCanonicalizing([$api->audience(ApiResource::Admin), $api->audience(ApiResource::Management)])
+        ->and($client->allowsScope(ManagementScope::RealmsWrite->value, [$api->audience(ApiResource::Admin)]))->toBeTrue()
+        ->and($client->allowsScope(ManagementScope::UsersWrite->value, [$api->audience(ApiResource::Management)]))->toBeTrue();
+
+    ($this->tokenRequest)('console-secret', ['resource' => 'https://elsewhere.test/api'])
+        ->assertStatus(400)
+        ->assertJsonPath('error', 'invalid_target');
 });
 
 it('provisions the console client with the configured id and secret', function () {

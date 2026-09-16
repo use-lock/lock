@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace App\Clients\Actions;
 
+use App\Admin\Enums\ApiResource;
 use App\Admin\Enums\BootstrapOutcome;
+use App\Admin\ManagementApi;
 use App\Clients\Enums\ClientAdminEvent;
 use App\Realms\Models\Realm;
 use App\Shared\Audit\Audit;
@@ -27,6 +29,7 @@ final readonly class ProvisionConsoleClient implements ProvisionsConsoleClient
 
     public function __construct(
         private ClientProvisioner $provisioner,
+        private ManagementApi $api,
     ) {}
 
     /**
@@ -53,11 +56,13 @@ final readonly class ProvisionConsoleClient implements ProvisionsConsoleClient
         ): BootstrapOutcome {
             $existing = $this->existingClient($realm, $clientId);
             $before = $existing instanceof Client ? $this->fingerprint($existing) : null;
+            $audiences = $this->apiAudiences();
 
             $result = $this->provisioner->provision(
                 name: $name,
                 redirectUris: $redirectUris,
                 postLogoutRedirectUris: $postLogoutRedirectUris,
+                allowedExchangeAudiences: $audiences,
                 adoptClientId: $existing?->client_id,
             );
 
@@ -65,6 +70,7 @@ final readonly class ProvisionConsoleClient implements ProvisionsConsoleClient
             $client->forceFill([
                 'client_id' => $clientId,
                 'grant_types' => self::GrantTypes,
+                'optional_scopes' => $this->withApiScopes($client->optional_scopes ?? [], $audiences),
             ]);
 
             if (! hash_equals((string) $client->secret, $clientSecret)) {
@@ -78,6 +84,29 @@ final readonly class ProvisionConsoleClient implements ProvisionsConsoleClient
 
             return $this->record($client, $realm, $result->wasCreated, $changed);
         }));
+    }
+
+    /**
+     * The console client addresses both of Lock's own APIs, with every scope
+     * they own, so infrastructure code holding its credentials can drive them.
+     *
+     * @return list<string>
+     */
+    private function apiAudiences(): array
+    {
+        return array_map($this->api->audience(...), ApiResource::cases());
+    }
+
+    /**
+     * @param  array<int, string>  $optionalScopes
+     * @param  list<string>  $audiences
+     * @return list<string>
+     */
+    private function withApiScopes(array $optionalScopes, array $audiences): array
+    {
+        $wildcards = array_map(fn (string $audience): string => $audience.' *', $audiences);
+
+        return array_values(array_unique([...$optionalScopes, ...$wildcards]));
     }
 
     private function existingClient(Realm $realm, string $clientId): ?Client
@@ -108,6 +137,8 @@ final readonly class ProvisionConsoleClient implements ProvisionsConsoleClient
             'redirect_uris' => $client->redirect_uris,
             'post_logout_redirect_uris' => $client->post_logout_redirect_uris,
             'grant_types' => $client->grant_types,
+            'allowed_exchange_audiences' => $client->allowed_exchange_audiences,
+            'optional_scopes' => $client->optional_scopes,
             'provisioning_key' => $client->provisioning_key,
             'secret' => (string) $client->getRawOriginal('secret'),
         ];
