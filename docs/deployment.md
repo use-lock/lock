@@ -126,7 +126,7 @@ credentials and the first administrator, and `app:deploy` brings the database in
 
 2. Start the stack (`docker compose up -d`, or deploy in Coolify). The `app` container runs `app:deploy` before its
    server starts: `migrate --force`, the data migrations (creates the master realm), `oidc:rotate-keys --if-missing` for every
-   realm, `app:bootstrap`, `lattice:discover-cache`, and `scramble:cache`. Every step is idempotent and safe to
+   realm, `app:bootstrap`, and `lattice:discover-cache`. Every step is idempotent and safe to
    repeat, so the master realm's signing key exists from this point on and no key material goes into the environment
    (details under [Signing keys](#signing-keys)). `queue` and `scheduler` start once `app` is healthy. `/up` answers
    `200` as soon as the server is up; it does not probe the database. To repeat the release step by hand:

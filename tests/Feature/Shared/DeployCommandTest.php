@@ -12,7 +12,7 @@ use Lock\Server\Clients\Models\Client;
 use Lock\Server\SigningKeys\Models\SigningKey;
 
 beforeEach(function () {
-    config(['scramble.cache.store' => 'array', 'lattice.discovery.cache_path' => $this->app->bootstrapPath('cache/lattice-deploy-test-'.getmypid().'.php')]);
+    config(['lattice.discovery.cache_path' => $this->app->bootstrapPath('cache/lattice-deploy-test-'.getmypid().'.php')]);
 });
 
 it('runs every deploy step and leaves the app state primed', function () {

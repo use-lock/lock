@@ -10,7 +10,7 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Description('Run the deploy steps every release needs: migrations, data migrations, signing keys, environment bootstrap, lattice discovery cache, OpenAPI document cache.')]
+#[Description('Run the deploy steps every release needs: migrations, data migrations, signing keys, environment bootstrap, lattice discovery cache.')]
 #[Signature('app:deploy')]
 final class DeployCommand extends Command
 {
@@ -35,7 +35,6 @@ final class DeployCommand extends Command
             ['oidc:rotate-keys --if-missing', $this->generateMissingSigningKeys(...)],
             ['app:bootstrap', fn (): int => $this->call('app:bootstrap')],
             ['lattice:discover-cache', fn (): int => $this->call('lattice:discover-cache')],
-            ['scramble:cache', fn (): int => $this->call('scramble:cache')],
         ];
 
         foreach ($steps as [$label, $step]) {

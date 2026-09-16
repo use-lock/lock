@@ -4,12 +4,15 @@ declare(strict_types=1);
 use App\Admin\Enums\ApiResource;
 use App\Admin\Enums\ManagementScope;
 use App\Admin\ManagementApi;
+use App\Admin\Support\PublishedOpenApiDocuments;
 use App\Admin\Ui\Remote\ApiReferenceTokens;
 use App\Realms\Models\Realm;
 use Lattice\Core\Contracts\SignsComponentReferences;
+use Lattice\Support\Testing\ComponentNode;
 
 use function Tests\Helpers\globalAdmin;
 use function Tests\Helpers\globalAdminWith;
+use function Tests\Helpers\latticeSchema;
 use function Tests\Helpers\managementApiToken;
 use function Tests\Helpers\playgroundTokenRequest;
 use function Tests\Helpers\provisionManagementApi;
@@ -92,6 +95,21 @@ it('refuses to mint a token for an admin who cannot write realms', function () {
 it('rejects mixed resource scopes in API token fixtures', function () {
     expect(fn () => managementApiToken($this, ManagementScope::RealmsRead, ManagementScope::ResourcesRead))
         ->toThrow(InvalidArgumentException::class);
+});
+
+it('serves the committed OpenAPI documents on this instance\'s host instead of generating them', function () {
+    $response = $this->actingAs(globalAdmin())->get(route('admin.api'))->assertOk();
+
+    $references = latticeSchema($response)->findAll(fn (ComponentNode $node): bool => $node->type() === 'api-reference');
+    $specs = array_map(fn (ComponentNode $node): mixed => $node->prop('spec'), $references);
+    $committed = array_map(
+        fn (string $group): array => json_decode(str_replace(PublishedOpenApiDocuments::EXPORT_URL, config('app.url'), (string) file_get_contents(base_path("openapi.{$group}.json"))), true),
+        ['admin', 'management', 'auth'],
+    );
+
+    expect($specs)->toBe($committed)
+        ->and($specs[0]['servers'][0]['url'])->toBe(config('app.url').'/api')
+        ->and(json_encode($specs))->not->toContain(PublishedOpenApiDocuments::EXPORT_URL);
 });
 
 it('closes the page to an admin without realms:read', function () {

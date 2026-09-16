@@ -18,7 +18,6 @@ beforeEach(function () {
         'lock.console_client' => ['id' => null, 'secret' => null],
         'lock.admin' => ['email' => 'root@example.test', 'password' => 'a-secure-password', 'name' => 'Root'],
         'lattice.discovery.cache_path' => $this->environmentPath.'/lattice.php',
-        'scramble.cache.store' => 'array',
     ]);
 });
 
@@ -74,7 +73,7 @@ it('sets up an empty installation without an existing key or SQLite database', f
         $app->useEnvironmentPath($argv[1]);
         $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
         $kernel->bootstrap();
-        config(['lattice.discovery.cache_path' => $argv[1].'/lattice.php', 'scramble.cache.store' => 'array']);
+        config(['lattice.discovery.cache_path' => $argv[1].'/lattice.php']);
         exit($kernel->call($argv[3], ['--no-interaction' => true]));
         PHP, $this->environmentPath, base_path(), 'app:setup'];
     $process = new Process($command, sys_get_temp_dir(), [
