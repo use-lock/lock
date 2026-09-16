@@ -170,7 +170,7 @@ it('documents social provider operations and payloads for the API playground', f
         expect($document['paths'][$path]['get']['security'])->toBe([['oauth2' => ['social-providers:read']]]);
     }
 
-    foreach (['post' => $collection, 'put' => $item, 'delete' => $item] as $method => $path) {
+    foreach (['post' => $collection, 'patch' => $item, 'delete' => $item] as $method => $path) {
         expect($document['paths'][$path][$method]['security'])->toBe([['oauth2' => ['social-providers:write']]]);
     }
 

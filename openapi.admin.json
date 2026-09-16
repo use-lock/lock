@@ -456,106 +456,6 @@
                 ],
                 "x-group": "admin"
             },
-            "put": {
-                "operationId": "v1.realms.update",
-                "description": "A realm's slug is immutable. Settings left out of `settings` keep\ntheir current value. Re-pointing the domain changes the issuer of every\ntoken the realm mints and restarts the domain check.",
-                "summary": "Update a realm",
-                "tags": ["Admin API"],
-                "parameters": [
-                    {
-                        "name": "realm",
-                        "in": "path",
-                        "required": true,
-                        "description": "The realm slug",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateRealmData"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/components/schemas/RealmData"
-                                        }
-                                    },
-                                    "required": ["data"]
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "401": {
-                        "description": "The access token is missing, expired, or not addressed to this API.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "description": "The RFC 6749 error code.",
-                                            "enum": ["invalid_token"]
-                                        },
-                                        "error_description": {
-                                            "type": "string",
-                                            "description": "A human readable explanation."
-                                        }
-                                    },
-                                    "required": ["error", "error_description"]
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "The access token does not grant realms:write.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "type": "string",
-                                            "description": "The RFC 6749 error code.",
-                                            "enum": ["insufficient_scope"]
-                                        },
-                                        "error_description": {
-                                            "type": "string",
-                                            "description": "A human readable explanation."
-                                        }
-                                    },
-                                    "required": ["error", "error_description"]
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "adminOAuth2": ["realms:write"]
-                    }
-                ],
-                "x-group": "admin"
-            },
             "delete": {
                 "operationId": "v1.realms.destroy",
                 "description": "Purges the realm's users, roles, clients, tokens and keys, and frees its\nslug. The administration realm cannot be deleted.",
@@ -652,7 +552,7 @@
                 "x-group": "admin"
             },
             "patch": {
-                "operationId": "api.v1.realms.update.patch",
+                "operationId": "v1.realms.update",
                 "description": "A realm's slug is immutable. Settings left out of `settings` keep\ntheir current value. Re-pointing the domain changes the issuer of every\ntoken the realm mints and restarts the domain check.",
                 "summary": "Update a realm",
                 "tags": ["Admin API"],

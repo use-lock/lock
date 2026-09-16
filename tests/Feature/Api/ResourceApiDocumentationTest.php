@@ -31,7 +31,7 @@ it('documents resource operations and nested scope commands for the playground',
             ->toBe([['oauth2' => [ManagementScope::ResourcesRead->value]]]);
     }
 
-    foreach (['post' => $collection, 'put' => $item, 'delete' => $item] as $method => $path) {
+    foreach (['post' => $collection, 'patch' => $item, 'delete' => $item] as $method => $path) {
         expect($document['paths'][$path][$method]['security'] ?? null)
             ->toBe([['oauth2' => [ManagementScope::ResourcesWrite->value]]]);
     }
