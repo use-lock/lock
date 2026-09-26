@@ -93,6 +93,10 @@ final class RealmSettingsPatch extends ApiData
         public Optional|bool $firstPartyTrusted,
         #[SpecProperty('Client ids that skip the consent screen.')]
         public Optional|array $trustedClients,
+        #[SpecProperty('Whether users are grouped into tenants, each holding its own roles. The master realm never has tenancy.')]
+        public Optional|bool $tenancy,
+        #[SpecProperty('Whether a self-registered user gets a personal tenant they own. Only applies with tenancy.')]
+        public Optional|bool $tenantOnRegistration,
     ) {}
 
     /**

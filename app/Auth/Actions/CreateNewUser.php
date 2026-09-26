@@ -5,13 +5,16 @@ namespace App\Auth\Actions;
 
 use App\Auth\Models\User;
 use App\Realms\Models\Realm;
+use App\Shared\Tenants\Contracts\ProvisionsPersonalTenant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Lock\Server\Authentication\Contracts\CreateUser;
 
-final class CreateNewUser implements CreateUser
+final readonly class CreateNewUser implements CreateUser
 {
+    public function __construct(private ProvisionsPersonalTenant $personalTenant) {}
+
     /**
      * @param  array<string, mixed>  $input
      */
@@ -30,11 +33,17 @@ final class CreateNewUser implements CreateUser
             'password' => ['required', 'string', 'confirmed'],
         ])->validate();
 
-        return DB::transaction(fn (): User => User::create([
-            'realm_id' => $realm->id,
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'password' => $input['password'],
-        ]));
+        return DB::transaction(function () use ($realm, $input): User {
+            $user = User::create([
+                'realm_id' => $realm->id,
+                'name' => $input['name'],
+                'email' => $input['email'],
+                'password' => $input['password'],
+            ]);
+
+            $this->personalTenant->forNewUser($user);
+
+            return $user;
+        });
     }
 }

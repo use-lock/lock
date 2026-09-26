@@ -35,7 +35,7 @@ final class UserRolesCard
                     ->schema($names === []
                         ? [Text::make(__('users.detail.realm-roles.none'))->color(ColorName::Muted)]
                         : array_map(fn (string $name): Badge => Badge::make($name), $names)),
-                $realm->roles()->exists()
+                $realm->roles()->realmWide()->exists()
                     ? ActionBar::button(Action::use(UpdateUserRoles::class))
                     : Link::make(__('users.detail.realm-roles.define'))->href(route('admin.realms.roles', ['realm' => $realm->slug], false)),
             ]),

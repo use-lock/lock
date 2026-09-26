@@ -10,6 +10,7 @@ use App\Realms\Enums\RealmDomainStatus;
 use App\Resources\Models\Resource;
 use App\Roles\Models\Role;
 use App\Shared\Resources\Contracts\ProvidesRealmResources;
+use App\Tenants\Models\Tenant;
 use Carbon\CarbonImmutable;
 use Database\Factories\RealmFactory;
 use Illuminate\Database\Eloquent\Attributes\Boot;
@@ -187,6 +188,24 @@ final class Realm extends Model implements RealmContract
     public function roles(): HasMany
     {
         return $this->hasMany(Role::class);
+    }
+
+    /**
+     * @return HasMany<Tenant, $this>
+     */
+    public function tenants(): HasMany
+    {
+        return $this->hasMany(Tenant::class);
+    }
+
+    public function hasTenancy(): bool
+    {
+        return $this->settings->tenancy;
+    }
+
+    public function createsTenantOnRegistration(): bool
+    {
+        return $this->settings->tenancy && $this->settings->tenantOnRegistration;
     }
 
     /**

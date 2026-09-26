@@ -16,7 +16,7 @@ final class SyncUserRoles
     public function handle(User $user, array $roleIds): void
     {
         $roleIds = array_values(array_unique($roleIds));
-        $after = $user->realm->roles()->findMany($roleIds);
+        $after = $user->realm->roles()->realmWide()->findMany($roleIds);
 
         if ($after->count() !== count($roleIds)) {
             throw new InvalidArgumentException('Every role has to belong to the realm of the user.');

@@ -97,6 +97,14 @@ test('just-in-time provisioning creates a verified user in the current realm', f
         ->and($user->hasVerifiedEmail())->toBeTrue();
 });
 
+test('just-in-time provisioning gives the user the personal tenant the realm promises', function () {
+    $this->realm->writeSettings(['tenancy' => true, 'tenant_on_registration' => true]);
+
+    $user = $this->realm->runAsCurrent(fn (): User => app(CreateUserFromSocialAccount::class)(realmSocialUser(), 'google'));
+
+    expect($user->tenants()->sole()->personal)->toBeTrue();
+});
+
 test('just-in-time provisioning refuses an identity the upstream has not verified', function (?string $email, bool $verified) {
     $provision = fn () => $this->realm->runAsCurrent(fn () => app(CreateUserFromSocialAccount::class)(realmSocialUser($verified, $email), 'google'));
 

@@ -9,6 +9,7 @@ use App\Realms\RealmsServiceProvider;
 use App\Resources\ResourcesServiceProvider;
 use App\Roles\RolesServiceProvider;
 use App\Shared\AppServiceProvider;
+use App\Tenants\TenantsServiceProvider;
 
 return [
     AppServiceProvider::class,
@@ -16,6 +17,7 @@ return [
     ClientsServiceProvider::class,
     AuthServiceProvider::class,
     RolesServiceProvider::class,
+    TenantsServiceProvider::class,
     ResourcesServiceProvider::class,
     AuditServiceProvider::class,
     AdminServiceProvider::class,

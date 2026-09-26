@@ -40,7 +40,7 @@ test('realm readers can inspect providers while editing tabs require write acces
     $superAdmin = $this->actingAs(globalAdmin())->get("/admin/realms/{$realm->slug}/settings")->assertOk();
 
     expect(renderedTabKeys($support))->toBe(['general', 'social'])
-        ->and(renderedTabKeys($superAdmin))->toBe(['general', 'login', 'social', 'tokens', 'sessions', 'mfa', 'passwords', 'clients']);
+        ->and(renderedTabKeys($superAdmin))->toBe(['general', 'login', 'social', 'tokens', 'sessions', 'mfa', 'passwords', 'clients', 'tenancy']);
 });
 
 test('a realm row counts the realm\'s users', function () {

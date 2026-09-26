@@ -94,6 +94,10 @@ final class RealmSettings extends Data
         public bool $firstPartyTrusted,
         #[SpecProperty('Client ids that skip the consent screen.')]
         public array $trustedClients,
+        #[SpecProperty('Whether users are grouped into tenants, each holding its own roles. The master realm never has tenancy.')]
+        public bool $tenancy = false,
+        #[SpecProperty('Whether a self-registered user gets a personal tenant they own. Only applies with tenancy.')]
+        public bool $tenantOnRegistration = false,
     ) {}
 
     /**

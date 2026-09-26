@@ -18,7 +18,10 @@ use App\Resources\Enums\ResourceAdminEvent;
 use App\Resources\Models\Resource;
 use App\Resources\Models\ResourceScope;
 use App\Roles\Enums\RoleAdminEvent;
+use App\Roles\Enums\RoleKind;
 use App\Roles\Models\Role;
+use App\Tenants\Models\Membership;
+use App\Tenants\Models\Tenant;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -153,6 +156,9 @@ function architecturePublicTypes(): array
         User::class,
         Realm::class,
         Role::class,
+        RoleKind::class,
+        Tenant::class,
+        Membership::class,
         Resource::class,
         ResourceScope::class,
         ManagementApi::class,

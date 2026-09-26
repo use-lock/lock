@@ -92,6 +92,25 @@ it('refuses to give the master realm a domain of its own', function () {
     expect(Realm::master()->domain)->toBeNull();
 });
 
+it('enables tenancy on a realm but refuses it on the master realm', function () {
+    $token = managementApiToken($this, ManagementScope::RealmsWrite);
+
+    $this->withToken($token)
+        ->patchJson(realmsUrl('/acme'), ['settings' => ['tenancy' => true, 'tenant_on_registration' => true]])
+        ->assertOk()
+        ->assertJsonPath('data.settings.tenancy', true);
+
+    auth()->forgetGuards();
+
+    $this->withToken($token)
+        ->patchJson(realmsUrl('/'.Realm::master()->slug), ['settings' => ['tenancy' => true]])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('settings.tenancy');
+
+    expect($this->acme->refresh()->createsTenantOnRegistration())->toBeTrue()
+        ->and(Realm::master()->hasTenancy())->toBeFalse();
+});
+
 it('deletes a realm and frees its slug', function () {
     $this->withToken(managementApiToken($this, ManagementScope::RealmsWrite))
         ->deleteJson(realmsUrl('/acme'))

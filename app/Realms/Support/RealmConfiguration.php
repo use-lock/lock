@@ -117,6 +117,8 @@ final class RealmConfiguration
             'first_party_trusted' => ['required', 'boolean'],
             'trusted_clients' => ['present', 'array', 'list', 'max:100'],
             'trusted_clients.*' => ['required', 'string', 'max:255', 'distinct'],
+            'tenancy' => ['required', 'boolean'],
+            'tenant_on_registration' => ['required', 'boolean'],
         ];
     }
 
@@ -137,6 +139,10 @@ final class RealmConfiguration
             'trusted_clients.*' => [
                 ...self::rules()['trusted_clients.*'],
                 Rule::exists('oidc_clients', 'client_id')->where('realm', $realmSlug)->whereNull('revoked_at'),
+            ],
+            'tenancy' => [
+                ...self::rules()['tenancy'],
+                ...($realmSlug === config('lock.master_realm') ? ['declined'] : []),
             ],
         ])->setAttributeNames(self::attributeNames())->validate();
     }
@@ -191,6 +197,10 @@ final class RealmConfiguration
                 'default_scopes' => RealmSettingType::StringList,
                 'optional_scopes' => RealmSettingType::StringList,
                 'trusted_clients' => RealmSettingType::StringList,
+            ],
+            'tenancy' => [
+                'tenancy' => RealmSettingType::Flag,
+                'tenant_on_registration' => RealmSettingType::Flag,
             ],
         ];
     }
