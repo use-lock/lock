@@ -14,12 +14,14 @@ use App\Roles\Actions\DeleteRole;
 use App\Roles\Actions\SyncUserRoles;
 use App\Roles\Actions\UpdateRole;
 use App\Roles\Enums\RoleAdminEvent;
+use App\Roles\Enums\RoleKind;
 use App\Roles\Models\Role;
 use App\Roles\Ui\Actions\DeleteRoleAction;
 use App\Roles\Ui\Actions\UpdateRoleAction;
 use App\Roles\Ui\Actions\UpdateUserRoles;
 use App\Roles\Ui\Forms\CreateRoleForm;
 use App\Roles\Ui\Tables\RolesTable;
+use App\Tenants\Models\Tenant;
 use Illuminate\Validation\ValidationException;
 
 use function Tests\Helpers\globalAdmin;
@@ -187,6 +189,31 @@ test('the role sync action itself refuses a role outside the user\'s realm', fun
     expect(fn () => app(SyncUserRoles::class)->handle($user, [$foreign->id]))
         ->toThrow(InvalidArgumentException::class)
         ->and($user->roles()->exists())->toBeFalse();
+});
+
+test('the role sync action refuses a tenant role as a realm-wide role', function (RoleKind $kind) {
+    $tenantRole = Role::factory()->for($this->realm)->create(['kind' => $kind]);
+    $user = User::factory()->for($this->realm)->create();
+
+    expect(fn () => app(SyncUserRoles::class)->handle($user, [$tenantRole->id]))
+        ->toThrow(InvalidArgumentException::class)
+        ->and($user->roles()->exists())->toBeFalse();
+})->with([RoleKind::TenantPreset, RoleKind::TenantOwner]);
+
+test('the roles table leaves out the roles a tenant owns', function () {
+    Role::factory()->for($this->realm)->create(['name' => 'owner', 'kind' => RoleKind::TenantOwner]);
+    Role::factory()->for($this->realm)->create([
+        'name' => 'accountant',
+        'kind' => RoleKind::Tenant,
+        'tenant_id' => Tenant::factory()->for($this->realm),
+    ]);
+
+    $rows = $this->actingAs(globalAdmin())
+        ->loadTable(RolesTable::class, context: ['realm' => 'acme'])
+        ->assertOk()
+        ->json('data');
+
+    expect(collect(is_array($rows) ? $rows : [])->pluck('name')->all())->toBe(['owner']);
 });
 
 test('granting and clearing master realm roles opens and closes the console', function () {

@@ -79,6 +79,7 @@ return [
         'mfa' => 'Mehrfaktor-Authentifizierung',
         'passwords' => 'Passwörter',
         'clients' => 'Client-Regeln',
+        'tenancy' => 'Tenants',
     ],
     'factors' => [
         'totp' => 'Authenticator-App (TOTP)',
@@ -229,6 +230,14 @@ return [
         'trusted-clients' => [
             'label' => 'Vertrauenswürdige Clients',
             'help-text' => 'Eine Client-Kennung aus diesem Realm pro Zeile. Diese Clients überspringen die Zustimmung.',
+        ],
+        'tenancy' => [
+            'label' => 'Tenancy',
+            'help-text' => 'Benutzer werden in Tenants gruppiert. Jeder Tenant hat eigene Rollen neben den Tenant-Vorlagen des Realms. Der Administrations-Realm hat keine Tenancy.',
+        ],
+        'tenant-on-registration' => [
+            'label' => 'Persönlicher Tenant bei Registrierung',
+            'help-text' => 'Wer sich registriert, bekommt einen persönlichen Tenant, den er besitzt. Gilt nur mit Tenancy.',
         ],
     ],
 ];

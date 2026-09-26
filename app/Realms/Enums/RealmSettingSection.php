@@ -13,4 +13,5 @@ enum RealmSettingSection: string
     case Mfa = 'mfa';
     case Passwords = 'passwords';
     case Clients = 'clients';
+    case Tenancy = 'tenancy';
 }

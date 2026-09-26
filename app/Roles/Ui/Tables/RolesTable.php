@@ -35,7 +35,7 @@ final class RolesTable extends EloquentTableDefinition
     {
         $realm = $this->contextModel('realm', Realm::class);
 
-        $builder = $realm->roles()->getQuery()
+        $builder = $realm->roles()->definedByRealm()->getQuery()
             ->select('roles.*')
             ->withCount('users');
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "64744f4a2d9142a6efd5f0d96656037d",
+    "content-hash": "54411abdec0f3803f252000b09aae232",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -10320,16 +10320,16 @@
         },
         {
             "name": "use-lock/server",
-            "version": "0.3.0",
+            "version": "dev-feat/scope-grant-seams",
             "source": {
                 "type": "git",
                 "url": "https://github.com/use-lock/server.git",
-                "reference": "22506bdadc65cad78af7a9bdcae6ddfef52a9183"
+                "reference": "d0f04f26174275c285d44ac46b8f105c27222fd6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/use-lock/server/zipball/22506bdadc65cad78af7a9bdcae6ddfef52a9183",
-                "reference": "22506bdadc65cad78af7a9bdcae6ddfef52a9183",
+                "url": "https://api.github.com/repos/use-lock/server/zipball/d0f04f26174275c285d44ac46b8f105c27222fd6",
+                "reference": "d0f04f26174275c285d44ac46b8f105c27222fd6",
                 "shasum": ""
             },
             "require": {
@@ -10416,7 +10416,7 @@
                 "issues": "https://github.com/use-lock/server/issues",
                 "source": "https://github.com/use-lock/server"
             },
-            "time": "2026-09-23T17:46:39+00:00"
+            "time": "2026-09-26T08:49:12+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -16674,9 +16674,18 @@
             "time": "2025-12-08T11:19:18+00:00"
         }
     ],
-    "aliases": [],
+    "aliases": [
+        {
+            "package": "use-lock/server",
+            "version": "dev-feat/scope-grant-seams",
+            "alias": "0.4.0",
+            "alias_normalized": "0.4.0.0"
+        }
+    ],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "use-lock/server": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

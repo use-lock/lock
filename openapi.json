@@ -5377,6 +5377,14 @@
                             "type": "string"
                         },
                         "minItems": 1
+                    },
+                    "tenancy": {
+                        "type": "boolean",
+                        "description": "Whether users are grouped into tenants, each holding its own roles. The master realm never has tenancy."
+                    },
+                    "tenant_on_registration": {
+                        "type": "boolean",
+                        "description": "Whether a self-registered user gets a personal tenant they own. Only applies with tenancy."
                     }
                 },
                 "required": [
@@ -5561,6 +5569,14 @@
                         "items": {
                             "type": "string"
                         }
+                    },
+                    "tenancy": {
+                        "type": "boolean",
+                        "description": "Whether users are grouped into tenants, each holding its own roles. The master realm never has tenancy."
+                    },
+                    "tenant_on_registration": {
+                        "type": "boolean",
+                        "description": "Whether a self-registered user gets a personal tenant they own. Only applies with tenancy."
                     }
                 },
                 "title": "RealmSettingsPatch"

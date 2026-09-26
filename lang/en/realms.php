@@ -79,6 +79,7 @@ return [
         'mfa' => 'Multi-factor authentication',
         'passwords' => 'Passwords',
         'clients' => 'Client rules',
+        'tenancy' => 'Tenants',
     ],
     'factors' => [
         'totp' => 'Authenticator app (TOTP)',
@@ -229,6 +230,14 @@ return [
         'trusted-clients' => [
             'label' => 'Trusted clients',
             'help-text' => 'One client identifier from this realm per line. These clients skip consent.',
+        ],
+        'tenancy' => [
+            'label' => 'Tenancy',
+            'help-text' => "Group users into tenants. Each tenant holds its own roles next to the realm's tenant presets. The administration realm has no tenancy.",
+        ],
+        'tenant-on-registration' => [
+            'label' => 'Personal tenant on registration',
+            'help-text' => 'A user who registers gets a personal tenant they own. Only applies with tenancy.',
         ],
     ],
 ];

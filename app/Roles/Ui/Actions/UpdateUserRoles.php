@@ -30,7 +30,7 @@ final class UpdateUserRoles extends ActionDefinition
     public function definition(Action $action): Action
     {
         $target = $this->realmUser();
-        $roles = $target->realm->roles()->orderBy('name')->get();
+        $roles = $target->realm->roles()->realmWide()->orderBy('name')->get();
 
         return $action
             ->label(__('users.detail.realm-roles.update'))

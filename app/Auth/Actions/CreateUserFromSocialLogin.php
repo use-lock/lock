@@ -5,14 +5,17 @@ namespace App\Auth\Actions;
 
 use App\Auth\Models\User;
 use App\Realms\Models\Realm;
+use App\Shared\Tenants\Contracts\ProvisionsPersonalTenant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Lock\Server\Shared\Brokering\CreateUserFromSocialAccount;
 use Lock\Server\Shared\Brokering\SocialAuthenticationException;
 use Lock\Server\Shared\Brokering\SocialUser;
 
-final class CreateUserFromSocialLogin implements CreateUserFromSocialAccount
+final readonly class CreateUserFromSocialLogin implements CreateUserFromSocialAccount
 {
+    public function __construct(private ProvisionsPersonalTenant $personalTenant) {}
+
     public function __invoke(SocialUser $socialUser, string $provider): User
     {
         $realm = Realm::current();
@@ -41,6 +44,7 @@ final class CreateUserFromSocialLogin implements CreateUserFromSocialAccount
             }
 
             $user->forceFill(['email_verified_at' => now()])->save();
+            $this->personalTenant->forNewUser($user);
 
             return $user;
         });
