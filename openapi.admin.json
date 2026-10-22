@@ -223,7 +223,24 @@
                                     "required": ["data", "links", "meta"]
                                 }
                             }
+                        },
+                        "headers": {
+                            "X-RateLimit-Limit": {
+                                "description": "The maximum number of requests allowed in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            },
+                            "X-RateLimit-Remaining": {
+                                "description": "The number of requests left in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
                         }
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
                     },
                     "401": {
                         "description": "The access token is missing, expired, or not addressed to this API.",
@@ -310,10 +327,27 @@
                                     "required": ["data"]
                                 }
                             }
+                        },
+                        "headers": {
+                            "X-RateLimit-Limit": {
+                                "description": "The maximum number of requests allowed in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            },
+                            "X-RateLimit-Remaining": {
+                                "description": "The number of requests left in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
                         }
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
                     },
                     "401": {
                         "description": "The access token is missing, expired, or not addressed to this API.",
@@ -399,10 +433,27 @@
                                     "required": ["data"]
                                 }
                             }
+                        },
+                        "headers": {
+                            "X-RateLimit-Limit": {
+                                "description": "The maximum number of requests allowed in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            },
+                            "X-RateLimit-Remaining": {
+                                "description": "The number of requests left in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
                         }
                     },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
                     },
                     "401": {
                         "description": "The access token is missing, expired, or not addressed to this API.",
@@ -474,7 +525,21 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No content"
+                        "description": "No content",
+                        "headers": {
+                            "X-RateLimit-Limit": {
+                                "description": "The maximum number of requests allowed in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            },
+                            "X-RateLimit-Remaining": {
+                                "description": "The number of requests left in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
                     },
                     "409": {
                         "description": "An error",
@@ -498,6 +563,9 @@
                     },
                     "404": {
                         "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
                     },
                     "401": {
                         "description": "The access token is missing, expired, or not addressed to this API.",
@@ -591,6 +659,20 @@
                                     "required": ["data"]
                                 }
                             }
+                        },
+                        "headers": {
+                            "X-RateLimit-Limit": {
+                                "description": "The maximum number of requests allowed in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            },
+                            "X-RateLimit-Remaining": {
+                                "description": "The number of requests left in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
                         }
                     },
                     "404": {
@@ -598,6 +680,9 @@
                     },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
                     },
                     "401": {
                         "description": "The access token is missing, expired, or not addressed to this API.",
@@ -2589,6 +2674,49 @@
             }
         },
         "responses": {
+            "ThrottleRequestsException": {
+                "description": "Rate limit exceeded",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "Error overview."
+                                }
+                            },
+                            "required": ["message"]
+                        }
+                    }
+                },
+                "headers": {
+                    "X-RateLimit-Limit": {
+                        "description": "The maximum number of requests allowed in the current window.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "X-RateLimit-Remaining": {
+                        "description": "The number of requests left in the current window.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "Retry-After": {
+                        "description": "Seconds to wait before sending another request.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "X-RateLimit-Reset": {
+                        "description": "Seconds until the current window resets.",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            },
             "ValidationException": {
                 "description": "Validation error",
                 "content": {

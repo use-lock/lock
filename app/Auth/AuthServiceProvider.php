@@ -20,8 +20,12 @@ use App\Auth\Ui\Pages\SetupTwoFactorPage;
 use App\Realms\Models\Realm;
 use App\Shared\Auth\Contracts\CreatesRealmUser;
 use App\Shared\Auth\Contracts\DeletesUser;
+use App\Shared\Auth\Support\RequestUser;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Lattice\Core\Facades\Lattice;
 use Lattice\Core\Support\Affix;
@@ -80,7 +84,21 @@ final class AuthServiceProvider extends ServiceProvider
         ));
 
         Lattice::context('user', User::class);
-        Lattice::endpoints('account', prefix: 'account/lattice', middleware: [ResolveRealm::class, 'web', AuthenticateIdentity::class.':identity']);
+        Lattice::endpoints('account', prefix: 'account/lattice', middleware: [ResolveRealm::class, 'web', AuthenticateIdentity::class.':identity', 'throttle:account']);
+
+        // The forms that check the current password get the same budget as the
+        // package's own password routes, so a hijacked session cannot guess it.
+        RateLimiter::for('account', static function (Request $request): array {
+            $key = (string) (RequestUser::of($request, 'identity')?->getKey() ?? $request->ip());
+            $component = $request->route('form') ?? $request->route('action');
+
+            return [
+                Limit::perMinute(120)->by($key),
+                ...in_array($component, ['profile.password', 'profile.delete-account'], true)
+                    ? [Limit::perMinute(5)->by('password:'.$key)]
+                    : [],
+            ];
+        });
 
         /*
          * The user provider already hides blocked users; this catches the

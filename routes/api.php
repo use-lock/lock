@@ -21,7 +21,7 @@ use Lock\Server\Tokens\Http\Middleware\CheckAudience;
  */
 Route::prefix('v1')
     ->name('api.v1.')
-    ->middleware('auth:oidc')
+    ->middleware(['auth:oidc', 'throttle:management-api'])
     ->group(function (): void {
         Route::middleware(CheckAudience::using(ApiResource::Admin))->group(function (): void {
             Route::middleware(EnsureScopes::using(ManagementScope::RealmsRead))->group(function (): void {

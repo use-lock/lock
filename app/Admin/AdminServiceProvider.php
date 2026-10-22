@@ -8,7 +8,10 @@ use App\Admin\Enums\ManagementScope;
 use App\Admin\Ui\Pages\ApiReferencePage;
 use App\Auth\Models\User;
 use App\Shared\Auth\Support\RequestUser;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Lattice\Core\Facades\Lattice;
 use Lattice\Ui\Components\MenuItem;
@@ -18,6 +21,10 @@ final class AdminServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        // Keyed by the token's principal: a person, or a client acting for itself.
+        RateLimiter::for('management-api', static fn (Request $request): Limit => Limit::perMinute(300)
+            ->by((string) ($request->user()?->getAuthIdentifier() ?? $request->ip())));
+
         Lattice::extend(
             'admin.sidebar.instance',
             static fn (): MenuItem => MenuItem::fromPage(ApiReferencePage::class)

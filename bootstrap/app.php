@@ -7,12 +7,12 @@ use App\Shared\Auth\Support\RequestUser;
 use App\Shared\Console\Commands\DeployCommand;
 use App\Shared\Console\Commands\SetupCommand;
 use App\Shared\Http\Middleware\HandleAppearance;
+use App\Shared\Http\Middleware\SecurityHeaders;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
-use Illuminate\Http\Middleware\FrameGuard;
 use Illuminate\Http\Request;
 use Illuminate\Session\Middleware\StartSession;
 use Inertia\Middleware as InertiaMiddleware;
@@ -33,10 +33,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // the proxy — narrow it to the proxy's address otherwise.
         $middleware->trustProxies(at: '*');
 
-        // Octane's Caddyfile sets no security headers, and a login page another
-        // origin can frame is open to clickjacking — global, so the OIDC
-        // package's own routes are covered as well.
-        $middleware->append(FrameGuard::class);
+        // Global, so the OIDC package's own routes are covered as well.
+        $middleware->append(SecurityHeaders::class);
 
         $middleware->encryptCookies(except: ['appearance']);
 
