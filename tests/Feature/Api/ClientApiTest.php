@@ -110,7 +110,8 @@ it('creates a confidential client and returns its secret', function () {
         ->assertJsonPath('data.client.name', 'Checkout')
         ->assertJsonPath('data.client.confidential', true)
         ->assertJsonPath('data.client.redirect_uris', ['https://checkout.test/callback'])
-        ->assertJsonPath('data.client.consent_required', true);
+        ->assertJsonPath('data.client.consent_required', true)
+        ->assertJsonPath('data.client.revoked', false);
 
     $client = Client::query()->where('client_id', $response->json('data.client.client_id'))->sole();
 
@@ -153,11 +154,12 @@ it('keeps what an update leaves out', function () {
 
 it('holds an update to the same invariants as a create', function () {
     $this->withToken(managementApiToken($this, ManagementScope::ClientsWrite))
-        ->patchJson(clientsUrl('acme', '/'.$this->client->client_id), ['redirect_uris' => []])
+        ->patchJson(clientsUrl('acme', '/'.$this->client->client_id), ['redirect_uris' => [], 'revoked' => true])
         ->assertUnprocessable()
         ->assertJsonValidationErrors('redirect_uris');
 
-    expect($this->client->refresh()->redirect_uris)->toBe(['https://rp.test/callback']);
+    expect($this->client->refresh()->redirect_uris)->toBe(['https://rp.test/callback'])
+        ->and($this->client->revoked_at)->toBeNull();
 });
 
 it('drops the secret when a client is turned public', function () {
@@ -214,4 +216,74 @@ it('refuses secret operations through a different realm or for public clients', 
         $this->withToken($token)->postJson(clientsUrl('acme', '/'.$public->client_id.'/'.$operation))->assertNotFound();
         auth()->forgetGuards();
     }
+});
+
+it('creates a client with the requested revocation state', function (bool $revoked) {
+    $response = $this->withToken(managementApiToken($this, ManagementScope::ClientsWrite))
+        ->postJson(clientsUrl(), clientPayload(['revoked' => $revoked]))
+        ->assertCreated()
+        ->assertJsonPath('data.client.revoked', $revoked);
+
+    $client = Client::query()->where('client_id', $response->json('data.client.client_id'))->sole();
+
+    expect($client->revoked_at !== null)->toBe($revoked)
+        ->and(AdminEvent::forRealm($this->acme)->where('type', ClientAdminEvent::ClientRevoked->type())->count())->toBe($revoked ? 1 : 0);
+})->with([true, false]);
+
+it('updates client revocation without losing configuration and records each transition once', function () {
+    $token = managementApiToken($this, ManagementScope::ClientsWrite);
+    $url = clientsUrl('acme', '/'.$this->client->client_id);
+
+    $this->withToken($token)->patchJson($url, ['revoked' => true])
+        ->assertOk()->assertJsonPath('data.revoked', true);
+    $revokedAt = $this->client->refresh()->revoked_at;
+    $this->travel(1)->seconds();
+
+    auth()->forgetGuards();
+    $this->withToken($token)->patchJson($url, ['name' => 'Renamed'])
+        ->assertOk()->assertJsonPath('data.revoked', true);
+
+    auth()->forgetGuards();
+    $this->withToken($token)->patchJson($url, ['revoked' => true])
+        ->assertOk()->assertJsonPath('data.revoked', true);
+
+    expect($this->client->refresh()->revoked_at)->toEqual($revokedAt);
+
+    auth()->forgetGuards();
+    $this->withToken($token)->patchJson($url, ['revoked' => false])
+        ->assertOk()
+        ->assertJsonPath('data.revoked', false)
+        ->assertJsonPath('data.name', 'Renamed')
+        ->assertJsonPath('data.redirect_uris', ['https://rp.test/callback']);
+
+    expect($this->client->refresh()->revoked_at)->toBeNull()
+        ->and(AdminEvent::forRealm($this->acme)->where('type', ClientAdminEvent::ClientRevoked->type())->count())->toBe(1)
+        ->and(AdminEvent::forRealm($this->acme)->where('type', ClientAdminEvent::ClientRestored->type())->count())->toBe(1);
+});
+
+it('rejects invalid revocation values without changing the client', function (mixed $revoked) {
+    $token = managementApiToken($this, ManagementScope::ClientsWrite);
+    $this->withToken($token)->postJson(clientsUrl(), clientPayload(['revoked' => $revoked]))
+        ->assertUnprocessable()->assertJsonValidationErrors('revoked');
+
+    auth()->forgetGuards();
+    $this->withToken($token)->patchJson(clientsUrl('acme', '/'.$this->client->client_id), ['revoked' => $revoked, 'name' => 'Changed'])
+        ->assertUnprocessable()->assertJsonValidationErrors('revoked');
+
+    expect(Client::query()->where('name', 'Checkout')->exists())->toBeFalse()
+        ->and($this->client->refresh()->name)->toBe('Partner portal')
+        ->and($this->client->revoked_at)->toBeNull();
+})->with([null, 'invalid', 2]);
+
+it('refuses revocation without write scope or through another realm', function () {
+    $url = clientsUrl('acme', '/'.$this->client->client_id);
+    $this->withToken(managementApiToken($this, ManagementScope::ClientsRead))
+        ->patchJson($url, ['revoked' => true])->assertForbidden();
+
+    $other = Realm::factory()->create();
+    auth()->forgetGuards();
+    $this->withToken(managementApiToken($this, ManagementScope::ClientsWrite))
+        ->patchJson(clientsUrl($other->slug, '/'.$this->client->client_id), ['revoked' => true])->assertNotFound();
+
+    expect($this->client->refresh()->revoked_at)->toBeNull();
 });

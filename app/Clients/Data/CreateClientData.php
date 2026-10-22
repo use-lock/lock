@@ -51,6 +51,8 @@ final class CreateClientData extends ApiData
         #[SpecProperty('Where a back-channel logout token is delivered.')]
         #[Max(2048), Url('http', 'https')]
         public Optional|string|null $backchannelLogoutUri,
+        #[SpecProperty('Whether the client is revoked. Defaults to false when omitted.')]
+        public Optional|bool $revoked = new Optional,
     ) {}
 
     public function toClientAttributes(): ClientAttributes
@@ -63,6 +65,7 @@ final class CreateClientData extends ApiData
             grantTypes: $this->grantTypes,
             consentRequired: $this->consentRequired instanceof Optional ? true : $this->consentRequired,
             backchannelLogoutUri: $this->backchannelLogoutUri instanceof Optional ? null : $this->backchannelLogoutUri,
+            revoked: $this->revoked,
         );
     }
 }

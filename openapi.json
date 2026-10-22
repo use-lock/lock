@@ -4362,6 +4362,10 @@
                         "format": "uri",
                         "description": "Where a back-channel logout token is delivered.",
                         "maxLength": 2048
+                    },
+                    "revoked": {
+                        "type": "boolean",
+                        "description": "Whether the client is revoked. Defaults to false when omitted."
                     }
                 },
                 "required": ["name", "token_endpoint_auth_method", "grant_types"],
@@ -5902,6 +5906,10 @@
                         "format": "uri",
                         "description": "Where a back-channel logout token is delivered; `null` clears it.",
                         "maxLength": 2048
+                    },
+                    "revoked": {
+                        "type": "boolean",
+                        "description": "Whether the client is revoked. Omit to keep the current state; false restores the client."
                     }
                 },
                 "title": "UpdateClientData"

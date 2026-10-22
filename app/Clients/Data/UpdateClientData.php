@@ -50,6 +50,8 @@ final class UpdateClientData extends ApiData
         #[SpecProperty('Where a back-channel logout token is delivered; `null` clears it.')]
         #[Max(2048), Url('http', 'https')]
         public Optional|string|null $backchannelLogoutUri,
+        #[SpecProperty('Whether the client is revoked. Omit to keep the current state; false restores the client.')]
+        public Optional|bool $revoked = new Optional,
     ) {}
 
     public function toClientAttributes(Client $client): ClientAttributes

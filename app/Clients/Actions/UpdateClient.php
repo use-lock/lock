@@ -10,10 +10,14 @@ use App\Shared\Audit\Audit;
 use Illuminate\Support\Facades\DB;
 use Lock\Server\Clients\ClientRepository;
 use Lock\Server\Clients\Models\Client;
+use Spatie\LaravelData\Optional;
 
 final readonly class UpdateClient
 {
-    public function __construct(private ClientRepository $clients) {}
+    public function __construct(
+        private ClientRepository $clients,
+        private SetClientRevocation $setRevocation,
+    ) {}
 
     public function handle(Client $client, ClientAttributes $attributes): void
     {
@@ -31,6 +35,10 @@ final readonly class UpdateClient
 
             if (! $wasConfidential && $attributes->confidential()) {
                 $this->clients->regenerateSecret($client);
+            }
+
+            if (! $attributes->revoked instanceof Optional) {
+                $this->setRevocation->handle($client, $attributes->revoked);
             }
 
             $changes = [];
