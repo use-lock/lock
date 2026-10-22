@@ -5,6 +5,7 @@ namespace App\Clients\Data;
 
 use App\Clients\Support\ClientConfiguration;
 use Lock\Server\Shared\Clients\TokenEndpointAuthMethod;
+use Spatie\LaravelData\Optional;
 
 final readonly class ClientAttributes
 {
@@ -32,6 +33,7 @@ final readonly class ClientAttributes
         array $grantTypes,
         public bool $consentRequired = true,
         public ?string $backchannelLogoutUri = null,
+        public Optional|bool $revoked = new Optional,
     ) {
         ClientConfiguration::validate([
             'name' => $name,

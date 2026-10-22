@@ -10,10 +10,14 @@ use App\Shared\Audit\Audit;
 use Illuminate\Support\Facades\DB;
 use Lock\Server\Clients\ClientRepository;
 use Lock\Server\Clients\Models\Client;
+use Spatie\LaravelData\Optional;
 
 final readonly class CreateClient
 {
-    public function __construct(private ClientRepository $clients) {}
+    public function __construct(
+        private ClientRepository $clients,
+        private SetClientRevocation $setRevocation,
+    ) {}
 
     /**
      * The repository stamps the current realm and its default scopes on the
@@ -33,6 +37,10 @@ final readonly class CreateClient
                 'client_id' => $client->client_id,
                 'name' => $client->name,
             ]);
+
+            if (! $attributes->revoked instanceof Optional) {
+                $this->setRevocation->handle($client, $attributes->revoked);
+            }
 
             return $client;
         }));
