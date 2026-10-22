@@ -12,29 +12,29 @@
         "types:check": "tsc --noEmit"
     },
     "devDependencies": {
-        "@inertiajs/vite": "^3.7.1",
+        "@inertiajs/vite": "^3.9.1",
         "@tailwindcss/vite": "^4.3.3",
-        "@types/node": "^26.5.0",
+        "@types/node": "^26.6.5",
         "@types/react": "^19.3.0",
         "@types/react-dom": "^19.3.0",
-        "@vitejs/plugin-react": "^6.1.1",
+        "@vitejs/plugin-react": "^6.1.2",
         "laravel-vite-plugin": "^3.2.0",
-        "oxfmt": "^0.67.0",
-        "oxlint": "^1.82.0",
-        "playwright": "^1.63.0",
+        "oxfmt": "^0.74.0",
+        "oxlint": "^1.89.0",
+        "playwright": "^1.64.1",
         "typescript": "^7.0.2",
-        "vite": "^8.3.0"
+        "vite": "^8.3.5"
     },
     "dependencies": {
         "@fontsource-variable/instrument-sans": "^5.3.0",
-        "@inertiajs/react": "^3.7.1",
+        "@inertiajs/react": "^3.9.1",
         "@laravel/passkeys": "^0.4.0",
         "@lattice-php/api-reference": "^0.77.0",
         "@lattice-php/core": "^0.77.0",
         "@lattice-php/lattice": "^0.77.0",
         "@lattice-php/ui": "^0.77.0",
-        "react": "^19.3.0",
-        "react-dom": "^19.3.0",
+        "react": "^19.3.1",
+        "react-dom": "^19.3.1",
         "tailwindcss": "^4.3.3"
     }
 }
