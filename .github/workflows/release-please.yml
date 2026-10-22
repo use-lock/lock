@@ -20,35 +20,10 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-      actions: write
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
-      - id: release
-        uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4
+      - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4
         with:
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-      - name: Run checks on the release pull request
-        if: steps.release.outputs.prs_created == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          RELEASE_PR: ${{ steps.release.outputs.pr }}
-        run: |
-          branch=$(jq -er '.headBranchName' <<< "$RELEASE_PR")
-          for workflow in php-tests php-static js browser; do
-            gh workflow run "$workflow.yml" --ref "$branch"
-          done
-
-  image:
-    needs: release
-    if: needs.release.outputs.release_created == 'true'
-    permissions:
-      contents: read
-      packages: write
-    uses: ./.github/workflows/docker.yml
-    with:
-      tag: ${{ needs.release.outputs.tag_name }}
