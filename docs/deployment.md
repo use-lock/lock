@@ -22,9 +22,14 @@ started explicitly for the same reason.
   last line of defence against leaks.
 - The image brings its own entrypoint, PHP settings, and healthcheck scripts; the Dockerfile adds the `bcmath`, `gmp`,
   and `intl` extensions, sets environment defaults, and starts `php artisan octane:start`. Octane runs FrankenPHP with
-  its own Caddyfile, not the image's. That Caddyfile sets no security headers, so `bootstrap/app.php` appends
-  Laravel's `FrameGuard` globally: every response carries `X-Frame-Options: SAMEORIGIN`, which keeps the login pages
-  out of other origins' frames.
+  its own Caddyfile, not the image's. That Caddyfile sets no security headers, so the app sends them on every
+  response: `X-Frame-Options: SAMEORIGIN` and `Content-Security-Policy: frame-ancestors 'self'; object-src 'none';
+  base-uri 'self'` keep the login pages out of other origins' frames, plus `X-Content-Type-Options: nosniff`,
+  `Referrer-Policy: strict-origin-when-cross-origin`, and on HTTPS `Strict-Transport-Security: max-age=31536000`,
+  without `includeSubDomains`, since other hosts under a realm's domain are not Lock's.
+- Rate limits: the sign-in, registration, password, and two-factor routes allow 5 attempts a minute, `oauth/token`
+  and the other token endpoints 60, and the management API 300 per token principal. The account console allows 120
+  requests a minute per user, and 5 for the forms that check the current password.
 - Multi-stage: `composer install --no-dev` → Vite build on Node 24 (the version CI uses; nothing in the repo pins
   one) → runtime image. The Vite stage needs `vendor/` because the Lattice Vite plugin discovers component packages
   from `vendor/composer/installed.json`. It runs `npm install` rather than `npm ci` for the same reason CI does: the
