@@ -2,7 +2,7 @@
     "openapi": "3.1.2",
     "info": {
         "title": "Lock API",
-        "version": "1.0.0",
+        "version": "0.0.0",
         "description": "OAuth and OpenID Connect endpoints, discovery metadata, and the APIs for managing this Lock instance. Protocol endpoints are served on each realm\u2019s own host.",
         "license": {
             "name": "MIT",

@@ -145,7 +145,7 @@ return [
         'default_content_type' => 'application/json',
         'info' => [
             'title' => env('APP_NAME', 'Lock').' AsyncAPI',
-            'version' => env('APP_VERSION', '0.0.1'),
+            'version' => trim((string) file_get_contents(base_path('version.txt'))),
         ],
         'laravel_extensions' => true,
         'scan_paths' => [

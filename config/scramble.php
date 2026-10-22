@@ -41,10 +41,8 @@ return [
     ],
 
     'info' => [
-        /*
-         * API version.
-         */
-        'version' => env('API_VERSION', '1.0.0'),
+        // The API ships with the app, so release-please's version.txt versions both.
+        'version' => trim((string) file_get_contents(base_path('version.txt'))),
 
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).
