@@ -144,7 +144,7 @@ return [
         'version' => '3.0.0',
         'default_content_type' => 'application/json',
         'info' => [
-            'title' => env('APP_NAME', 'Laravel').' AsyncAPI',
+            'title' => env('APP_NAME', 'Lock').' AsyncAPI',
             'version' => env('APP_VERSION', '0.0.1'),
         ],
         'laravel_extensions' => true,
