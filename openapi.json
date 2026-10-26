@@ -2,7 +2,7 @@
     "openapi": "3.1.2",
     "info": {
         "title": "Lock API",
-        "version": "0.1.0",
+        "version": "0.2.0",
         "description": "OAuth and OpenID Connect endpoints, discovery metadata, and the APIs for managing this Lock instance. Protocol endpoints are served on each realm’s own host.",
         "license": {
             "name": "MIT",
@@ -5303,7 +5303,7 @@
                     },
                     "allowed_audiences": {
                         "type": "array",
-                        "description": "The RFC 8707 resources the client may request tokens for, each spelled exactly as the client sends it in `resource` and as it appears in the token's `aud`: the realm's issuer, or a registered resource's identifier resolved against it \u2014 a path-relative identifier such as `/docpipe` becomes the issuer with that path appended, an absolute one stays as it is.",
+                        "description": "The RFC 8707 resources the client may request tokens for, each spelled exactly as the client sends it in `resource` and as it appears in the token's `aud`: the realm's issuer, or a registered resource's identifier resolved against it — a path-relative identifier such as `/docpipe` becomes the issuer with that path appended, an absolute one stays as it is.",
                         "items": {
                             "type": "string"
                         },

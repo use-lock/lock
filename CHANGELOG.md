@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/use-lock/lock/compare/v0.1.0...v0.2.0) (2026-10-26)
+
+
+### Features
+
+* set a client's allowed audiences through the management API ([#28](https://github.com/use-lock/lock/issues/28)) ([1255b68](https://github.com/use-lock/lock/commit/1255b68b7fdfc372c3c043464bf2e35b02e87d73))
+
 ## 0.1.0 (2026-10-22)
 
 
