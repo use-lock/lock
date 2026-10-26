@@ -77,11 +77,13 @@ return [
         'client-credentials-needs-secret' => 'Der Client-Credentials-Grant setzt einen vertraulichen Client voraus.',
         'redirect-uri-required' => 'Für den Authorization-Code-Grant ist mindestens eine Redirect-URI erforderlich.',
         'invalid-uri' => 'Die URI :uri muss absolut sein, Schema und Host enthalten und kein Fragment haben.',
+        'unknown-audience' => 'Die Audience :audience ist weder der Issuer dieses Realms noch eine seiner registrierten Ressourcen.',
     ],
     'detail' => [
         'description' => 'Client von :realm.',
         'created-at' => 'Erstellt',
         'scopes' => 'Scopes',
+        'allowed-audiences' => 'Erlaubte Audiences',
         'secret' => [
             'heading' => 'Client-Secret',
             'subtitle' => 'Zum Kopieren das Secret aufklappen. Bei einem Leck rotieren.',
@@ -90,7 +92,7 @@ return [
         ],
         'settings' => [
             'heading' => 'Einstellungen',
-            'subtitle' => 'Öffnen Sie eine Zeile, um die Einstellung zu ändern. Client-ID, Scopes und Status sind fest.',
+            'subtitle' => 'Öffnen Sie eine Zeile, um die Einstellung zu ändern. Client-ID, Scopes, erlaubte Audiences und Status sind fest.',
         ],
         'rotate-secret' => [
             'label' => 'Secret rotieren',

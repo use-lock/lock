@@ -5,6 +5,7 @@ namespace App\Clients\Actions;
 
 use App\Clients\Data\ClientAttributes;
 use App\Clients\Enums\ClientAdminEvent;
+use App\Clients\Services\RealmAudienceAllowlist;
 use App\Realms\Models\Realm;
 use App\Shared\Audit\Audit;
 use Illuminate\Support\Facades\DB;
@@ -17,6 +18,7 @@ final readonly class CreateClient
     public function __construct(
         private ClientRepository $clients,
         private SetClientRevocation $setRevocation,
+        private RealmAudienceAllowlist $audiences,
     ) {}
 
     /**
@@ -25,6 +27,8 @@ final readonly class CreateClient
      */
     public function handle(Realm $realm, ClientAttributes $attributes): Client
     {
+        $this->audiences->assertAllowed($realm, $attributes->allowedAudiences);
+
         return DB::transaction(fn (): Client => $realm->runAsCurrent(function () use ($realm, $attributes): Client {
             $client = $attributes->usesAuthorizationCode()
                 ? $this->clients->createAuthorizationCodeGrantClient($attributes->name, $attributes->redirectUris, $attributes->confidential())

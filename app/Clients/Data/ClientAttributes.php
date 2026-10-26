@@ -20,10 +20,14 @@ final readonly class ClientAttributes
     /** @var list<string> */
     public array $postLogoutRedirectUris;
 
+    /** @var list<string> */
+    public array $allowedAudiences;
+
     /**
      * @param  list<string>  $redirectUris
      * @param  list<string>  $postLogoutRedirectUris
      * @param  list<string>  $grantTypes
+     * @param  list<string>  $allowedAudiences  the RFC 8707 resources the client may request tokens for
      */
     public function __construct(
         public string $name,
@@ -34,6 +38,7 @@ final readonly class ClientAttributes
         public bool $consentRequired = true,
         public ?string $backchannelLogoutUri = null,
         public Optional|bool $revoked = new Optional,
+        array $allowedAudiences = [],
     ) {
         ClientConfiguration::validate([
             'name' => $name,
@@ -43,11 +48,13 @@ final readonly class ClientAttributes
             'post_logout_redirect_uris' => $postLogoutRedirectUris,
             'consent_required' => $consentRequired,
             'backchannel_logout_uri' => $backchannelLogoutUri,
+            'allowed_audiences' => $allowedAudiences,
         ]);
 
         $this->grantTypes = array_values(array_unique($grantTypes));
         $this->redirectUris = self::uris($redirectUris);
         $this->postLogoutRedirectUris = self::uris($postLogoutRedirectUris);
+        $this->allowedAudiences = self::uris($allowedAudiences);
     }
 
     /**
@@ -80,6 +87,7 @@ final readonly class ClientAttributes
             'grant_types' => $this->grantTypes,
             'consent_required' => $this->consentRequired,
             'backchannel_logout_uri' => $this->backchannelLogoutUri,
+            'allowed_exchange_audiences' => $this->allowedAudiences,
         ];
     }
 }

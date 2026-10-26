@@ -5,6 +5,7 @@ namespace App\Clients\Actions;
 
 use App\Clients\Data\ClientAttributes;
 use App\Clients\Enums\ClientAdminEvent;
+use App\Clients\Services\RealmAudienceAllowlist;
 use App\Realms\Models\Realm;
 use App\Shared\Audit\Audit;
 use Illuminate\Support\Facades\DB;
@@ -17,10 +18,17 @@ final readonly class UpdateClient
     public function __construct(
         private ClientRepository $clients,
         private SetClientRevocation $setRevocation,
+        private RealmAudienceAllowlist $audiences,
     ) {}
 
     public function handle(Client $client, ClientAttributes $attributes): void
     {
+        $this->audiences->assertAllowed(
+            Realm::ofClient($client),
+            $attributes->allowedAudiences,
+            array_values($client->allowed_exchange_audiences ?? []),
+        );
+
         DB::transaction(function () use ($client, $attributes): void {
             $before = $client->only(array_keys($attributes->toArray()));
             $wasConfidential = $client->snapshot()->confidential;

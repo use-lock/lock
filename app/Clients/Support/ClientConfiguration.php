@@ -25,6 +25,7 @@ final class ClientConfiguration
             'post_logout_redirect_uris' => ['present', 'array', 'list', 'max:'.self::URI_LIMIT, new AbsoluteUris],
             'consent_required' => ['required', 'boolean'],
             'backchannel_logout_uri' => ['nullable', 'string', 'max:2048', 'url:http,https'],
+            'allowed_audiences' => ['present', 'array', 'list', 'max:'.self::URI_LIMIT, new AbsoluteUris],
         ])->validate();
     }
 
@@ -43,6 +44,7 @@ final class ClientConfiguration
             'post_logout_redirect_uris' => [],
             'consent_required' => true,
             'backchannel_logout_uri' => null,
+            'allowed_audiences' => [],
         ], ...$stored, ...$patch];
 
         if ($values['token_endpoint_auth_method'] instanceof TokenEndpointAuthMethod) {
