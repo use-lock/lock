@@ -299,7 +299,7 @@ function realmIssuer(Realm $realm): string
 }
 
 it('allows a client the realm audiences it lists, spelled as the token addresses them', function () {
-    Resource::factory()->for($this->acme)->create(['identifier' => '/docpipe']);
+    Resource::factory()->for($this->acme)->create(['identifier' => 'docpipe']);
     Resource::factory()->for($this->acme)->absolute('https://docpipe.example')->create();
     $audiences = [realmIssuer($this->acme).'/docpipe', 'https://docpipe.example', realmIssuer($this->acme)];
 
@@ -351,7 +351,7 @@ it('replaces the allowed audiences on update and keeps those whose resource is g
 
 it('binds a client credentials token to the allowed audience the client requests', function () {
     $docs = createRealm('Docs', 'docs', 'docs.test');
-    Resource::factory()->for($docs)->create(['identifier' => '/docpipe']);
+    Resource::factory()->for($docs)->create(['identifier' => 'docpipe']);
     $audience = realmIssuer($docs).'/docpipe';
 
     $created = $this->withToken(managementApiToken($this, ManagementScope::ClientsWrite))

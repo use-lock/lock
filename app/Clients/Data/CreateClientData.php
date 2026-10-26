@@ -54,7 +54,7 @@ final class CreateClientData extends ApiData
         public Optional|string|null $backchannelLogoutUri,
         #[SpecProperty('Whether the client is revoked. Defaults to false when omitted.')]
         public Optional|bool $revoked = new Optional,
-        #[SpecProperty('The RFC 8707 resources the client may request tokens for, each spelled exactly as the client sends it in `resource` and as it appears in the token\'s `aud`: the realm\'s issuer, or a registered resource\'s identifier resolved against it — a path-relative identifier such as `/docpipe` becomes the issuer with that path appended, an absolute one stays as it is.')]
+        #[SpecProperty('The RFC 8707 resources the client may request tokens for, each spelled exactly as the client sends it in `resource` and as it appears in the token\'s `aud`: the realm\'s issuer, or a registered resource\'s identifier resolved against it — a relative identifier, a bare path segment such as `docpipe`, becomes the issuer with `/docpipe` appended, an absolute one stays as it is.')]
         #[ArrayType, ListType, Max(ClientConfiguration::URI_LIMIT), Rule(new AbsoluteUris)]
         public Optional|array $allowedAudiences = new Optional,
     ) {}
