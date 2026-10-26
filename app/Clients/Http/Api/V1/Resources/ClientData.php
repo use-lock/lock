@@ -21,6 +21,7 @@ final class ClientData extends Data
      * @param  list<string>  $redirectUris
      * @param  list<string>  $postLogoutRedirectUris
      * @param  list<string>  $scopes
+     * @param  list<string>  $allowedAudiences
      */
     public function __construct(
         #[SpecProperty('The identifier a relying party authenticates with, and its path in this API.')]
@@ -45,6 +46,8 @@ final class ClientData extends Data
         public ?string $backchannelLogoutUri,
         #[SpecProperty('The scopes the client is granted, from the realm’s client policy.')]
         public array $scopes,
+        #[SpecProperty('The RFC 8707 resources the client may request tokens for, each exactly the `resource` value it sends and the `aud` its token then carries.')]
+        public array $allowedAudiences,
         #[SpecProperty('Whether the client is blocked from obtaining tokens.')]
         public bool $revoked,
         #[SpecProperty('When the client was blocked, if it is.')]
@@ -69,6 +72,7 @@ final class ClientData extends Data
             consentRequired: $client->consent_required,
             backchannelLogoutUri: $client->backchannel_logout_uri,
             scopes: $client->snapshot()->assignedScopes(),
+            allowedAudiences: array_values($client->allowed_exchange_audiences ?? []),
             revoked: $client->snapshot()->revoked,
             revokedAt: $client->revoked_at?->toImmutable(),
             createdAt: $client->created_at?->toImmutable(),

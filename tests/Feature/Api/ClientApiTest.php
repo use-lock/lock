@@ -8,11 +8,16 @@ use App\Admin\Enums\ManagementScope;
 use App\Audit\Models\AdminEvent;
 use App\Clients\Enums\ClientAdminEvent;
 use App\Realms\Models\Realm;
+use App\Resources\Models\Resource;
 use Lock\Server\Clients\Models\Client;
 use Lock\Server\Shared\Clients\TokenEndpointAuthMethod;
+use Lock\Server\Shared\Realms\IssuerResolver;
 
+use function Tests\Helpers\createRealm;
+use function Tests\Helpers\jwtClaims;
 use function Tests\Helpers\managementApiToken;
 use function Tests\Helpers\realmClient;
+use function Tests\Helpers\realmRoute;
 use function Tests\Helpers\realmUrl;
 
 beforeEach(function () {
@@ -286,4 +291,80 @@ it('refuses revocation without write scope or through another realm', function (
         ->patchJson(clientsUrl($other->slug, '/'.$this->client->client_id), ['revoked' => true])->assertNotFound();
 
     expect($this->client->refresh()->revoked_at)->toBeNull();
+});
+
+function realmIssuer(Realm $realm): string
+{
+    return $realm->runAsCurrent(fn (): string => app(IssuerResolver::class)->url());
+}
+
+it('allows a client the realm audiences it lists, spelled as the token addresses them', function () {
+    Resource::factory()->for($this->acme)->create(['identifier' => '/docpipe']);
+    Resource::factory()->for($this->acme)->absolute('https://docpipe.example')->create();
+    $audiences = [realmIssuer($this->acme).'/docpipe', 'https://docpipe.example', realmIssuer($this->acme)];
+
+    $response = $this->withToken(managementApiToken($this, ManagementScope::ClientsWrite))
+        ->postJson(clientsUrl(), clientPayload(['allowed_audiences' => $audiences]))
+        ->assertCreated()
+        ->assertJsonPath('data.client.allowed_audiences', $audiences);
+
+    expect(Client::query()->where('client_id', $response->json('data.client.client_id'))->sole()->snapshot()->allowedAudiences)
+        ->toBe($audiences);
+});
+
+it('rejects an allowed audience the realm does not answer to', function (string $audience) {
+    Resource::factory()->for(Realm::master())->create(['identifier' => 'docpipe']);
+
+    $this->withToken(managementApiToken($this, ManagementScope::ClientsWrite))
+        ->postJson(clientsUrl(), clientPayload(['allowed_audiences' => [$audience]]))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('allowed_audiences');
+
+    expect(Client::query()->where('name', 'Checkout')->exists())->toBeFalse();
+})->with([
+    'a relative identifier' => fn (): string => '/docpipe',
+    'an unregistered resource' => fn (): string => realmIssuer(Realm::query()->where('slug', 'acme')->sole()).'/docpipe',
+    'another realm\'s resource' => fn (): string => realmIssuer(Realm::master()).'/docpipe',
+]);
+
+it('replaces the allowed audiences on update and keeps those whose resource is gone', function () {
+    Resource::factory()->for($this->acme)->create(['identifier' => 'docpipe']);
+    $this->client->forceFill(['allowed_exchange_audiences' => ['https://retired.example']])->save();
+    $url = clientsUrl('acme', '/'.$this->client->client_id);
+    $token = managementApiToken($this, ManagementScope::ClientsWrite);
+    $audiences = ['https://retired.example', realmIssuer($this->acme).'/docpipe'];
+
+    $this->withToken($token)->patchJson($url, ['allowed_audiences' => $audiences])
+        ->assertOk()
+        ->assertJsonPath('data.allowed_audiences', $audiences);
+
+    auth()->forgetGuards();
+    $this->withToken($token)->patchJson($url, ['allowed_audiences' => [...$audiences, 'https://unknown.example']])
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('allowed_audiences');
+
+    auth()->forgetGuards();
+    $this->withToken($token)->patchJson($url, ['name' => 'Renamed'])
+        ->assertOk()
+        ->assertJsonPath('data.allowed_audiences', $audiences);
+});
+
+it('binds a client credentials token to the allowed audience the client requests', function () {
+    $docs = createRealm('Docs', 'docs', 'docs.test');
+    Resource::factory()->for($docs)->create(['identifier' => '/docpipe']);
+    $audience = realmIssuer($docs).'/docpipe';
+
+    $created = $this->withToken(managementApiToken($this, ManagementScope::ClientsWrite))
+        ->postJson(clientsUrl('docs'), clientPayload([
+            'grant_types' => ['client_credentials'],
+            'redirect_uris' => [],
+            'allowed_audiences' => [$audience],
+        ]))
+        ->assertCreated();
+
+    $token = $this->withBasicAuth($created->json('data.client.client_id'), $created->json('data.credentials.secret'))
+        ->post(realmRoute($docs, 'oidc.token'), ['grant_type' => 'client_credentials', 'resource' => $audience])
+        ->assertOk();
+
+    expect(jwtClaims($token->json('access_token'))['aud'])->toBe($audience);
 });

@@ -135,6 +135,8 @@ final class ClientDetailPage extends AdminPage
                     ->disclosure([Form::use(UpdateClientForm::class, ['field' => 'backchannel_logout_uri'])]),
                 ComponentEntry::make('scopes', __('clients.detail.scopes'), 'client-scopes')
                     ->value($this->badges($client->snapshot()->assignedScopes())),
+                ComponentEntry::make('allowed_audiences', __('clients.detail.allowed-audiences'), 'client-allowed-audiences')
+                    ->value($this->uriLines($client->allowed_exchange_audiences)),
                 BadgeEntry::make('status', __('clients.columns.status'), 'client-status')
                     ->value($client->snapshot()->revoked ? __('clients.status.blocked') : __('clients.status.active'))
                     ->color($client->snapshot()->revoked ? ColorName::Danger : ColorName::Success),

@@ -29,6 +29,7 @@ final class UpdateClientData extends ApiData
      * @param  list<string>|Optional  $grantTypes
      * @param  list<string>|Optional  $redirectUris
      * @param  list<string>|Optional  $postLogoutRedirectUris
+     * @param  list<string>|Optional  $allowedAudiences
      */
     public function __construct(
         #[SpecProperty('Human readable name, shown to the identity on the consent screen.')]
@@ -52,13 +53,19 @@ final class UpdateClientData extends ApiData
         public Optional|string|null $backchannelLogoutUri,
         #[SpecProperty('Whether the client is revoked. Omit to keep the current state; false restores the client.')]
         public Optional|bool $revoked = new Optional,
+        #[SpecProperty('The RFC 8707 resources the client may request tokens for, spelled as the client sends them in `resource`. Replaces the current list.')]
+        #[ArrayType, ListType, Max(ClientConfiguration::URI_LIMIT), Rule(new AbsoluteUris)]
+        public Optional|array $allowedAudiences = new Optional,
     ) {}
 
     public function toClientAttributes(Client $client): ClientAttributes
     {
         return CreateClientData::from(ClientConfiguration::merge(
             $this->toAttributes(),
-            $client->only(['name', 'token_endpoint_auth_method', 'grant_types', 'redirect_uris', 'post_logout_redirect_uris', 'consent_required', 'backchannel_logout_uri']),
+            [
+                ...$client->only(['name', 'token_endpoint_auth_method', 'grant_types', 'redirect_uris', 'post_logout_redirect_uris', 'consent_required', 'backchannel_logout_uri']),
+                'allowed_audiences' => array_values($client->allowed_exchange_audiences ?? []),
+            ],
         ))->toClientAttributes();
     }
 }

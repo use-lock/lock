@@ -30,6 +30,7 @@ final class CreateClientData extends ApiData
      * @param  list<string>  $grantTypes
      * @param  list<string>  $redirectUris
      * @param  list<string>  $postLogoutRedirectUris
+     * @param  list<string>|Optional  $allowedAudiences
      */
     public function __construct(
         #[SpecProperty('Human readable name, shown to the identity on the consent screen.')]
@@ -53,6 +54,9 @@ final class CreateClientData extends ApiData
         public Optional|string|null $backchannelLogoutUri,
         #[SpecProperty('Whether the client is revoked. Defaults to false when omitted.')]
         public Optional|bool $revoked = new Optional,
+        #[SpecProperty('The RFC 8707 resources the client may request tokens for, each spelled exactly as the client sends it in `resource` and as it appears in the token\'s `aud`: the realm\'s issuer, or a registered resource\'s identifier resolved against it — a path-relative identifier such as `/docpipe` becomes the issuer with that path appended, an absolute one stays as it is.')]
+        #[ArrayType, ListType, Max(ClientConfiguration::URI_LIMIT), Rule(new AbsoluteUris)]
+        public Optional|array $allowedAudiences = new Optional,
     ) {}
 
     public function toClientAttributes(): ClientAttributes
@@ -66,6 +70,7 @@ final class CreateClientData extends ApiData
             consentRequired: $this->consentRequired instanceof Optional ? true : $this->consentRequired,
             backchannelLogoutUri: $this->backchannelLogoutUri instanceof Optional ? null : $this->backchannelLogoutUri,
             revoked: $this->revoked,
+            allowedAudiences: $this->allowedAudiences instanceof Optional ? [] : $this->allowedAudiences,
         );
     }
 }

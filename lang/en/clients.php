@@ -77,11 +77,13 @@ return [
         'client-credentials-needs-secret' => 'The client credentials grant requires a confidential client.',
         'redirect-uri-required' => 'At least one redirect URI is required for the authorization code grant.',
         'invalid-uri' => 'The URI :uri must be absolute with a scheme and a host and no fragment.',
+        'unknown-audience' => 'The audience :audience is neither this realm\'s issuer nor one of its registered resources.',
     ],
     'detail' => [
         'description' => 'Client of :realm.',
         'created-at' => 'Created',
         'scopes' => 'Scopes',
+        'allowed-audiences' => 'Allowed audiences',
         'secret' => [
             'heading' => 'Client secret',
             'subtitle' => 'Reveal the secret when you need to copy it. Rotate it if it leaks.',
@@ -90,7 +92,7 @@ return [
         ],
         'settings' => [
             'heading' => 'Settings',
-            'subtitle' => 'Open a row to change that setting. Client ID, scopes and status are fixed.',
+            'subtitle' => 'Open a row to change that setting. Client ID, scopes, allowed audiences and status are fixed.',
         ],
         'rotate-secret' => [
             'label' => 'Rotate secret',
