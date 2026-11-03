@@ -743,7 +743,8 @@
                                 "$ref": "#/components/schemas/UpdateRealmData"
                             }
                         }
-                    }
+                    },
+                    "required": true
                 },
                 "responses": {
                     "200": {
@@ -840,6 +841,664 @@
                     },
                     "429": {
                         "$ref": "#/components/responses/ThrottleRequestsException"
+                    }
+                },
+                "security": [
+                    {
+                        "adminOAuth2": [
+                            "realms:write"
+                        ]
+                    }
+                ],
+                "x-group": "admin"
+            }
+        },
+        "/v1/realms/{realm}/theme-assets": {
+            "get": {
+                "operationId": "v1.realms.theme-assets.index",
+                "summary": "List a realm's theme files",
+                "tags": [
+                    "Admin API"
+                ],
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Available sorts are `name`, `created_at`. You can sort by multiple options by separating them with a comma. To sort in descending order, use `-` sign in front of the sort, for example: `-name`.",
+                        "style": "form",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "name",
+                                    "-name",
+                                    "created_at",
+                                    "-created_at"
+                                ]
+                            }
+                        },
+                        "explode": false
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number to retrieve.",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "The number of items to retrieve per page.",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 100
+                        }
+                    },
+                    {
+                        "name": "realm",
+                        "in": "path",
+                        "required": true,
+                        "description": "The realm slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated set of `RealmThemeAssetData`",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/RealmThemeAssetData"
+                                            }
+                                        },
+                                        "links": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "url": {
+                                                        "type": [
+                                                            "string",
+                                                            "null"
+                                                        ]
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    },
+                                                    "active": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "url",
+                                                    "label",
+                                                    "active"
+                                                ]
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "first_page_url": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "from": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "minimum": 1
+                                                },
+                                                "last_page_url": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "next_page_url": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "path": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                },
+                                                "prev_page_url": {
+                                                    "type": [
+                                                        "string",
+                                                        "null"
+                                                    ]
+                                                },
+                                                "to": {
+                                                    "type": [
+                                                        "integer",
+                                                        "null"
+                                                    ],
+                                                    "minimum": 1
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "minimum": 0
+                                                }
+                                            },
+                                            "required": [
+                                                "current_page",
+                                                "first_page_url",
+                                                "from",
+                                                "last_page",
+                                                "last_page_url",
+                                                "next_page_url",
+                                                "path",
+                                                "per_page",
+                                                "prev_page_url",
+                                                "to",
+                                                "total"
+                                            ]
+                                        }
+                                    },
+                                    "required": [
+                                        "data",
+                                        "links",
+                                        "meta"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-RateLimit-Limit": {
+                                "description": "The maximum number of requests allowed in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            },
+                            "X-RateLimit-Remaining": {
+                                "description": "The number of requests left in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
+                    },
+                    "401": {
+                        "description": "The access token is missing, expired, or not addressed to this API.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "The RFC 6749 error code.",
+                                            "enum": [
+                                                "invalid_token"
+                                            ]
+                                        },
+                                        "error_description": {
+                                            "type": "string",
+                                            "description": "A human readable explanation."
+                                        }
+                                    },
+                                    "required": [
+                                        "error",
+                                        "error_description"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The access token does not grant realms:read.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "The RFC 6749 error code.",
+                                            "enum": [
+                                                "insufficient_scope"
+                                            ]
+                                        },
+                                        "error_description": {
+                                            "type": "string",
+                                            "description": "A human readable explanation."
+                                        }
+                                    },
+                                    "required": [
+                                        "error",
+                                        "error_description"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    }
+                },
+                "security": [
+                    {
+                        "adminOAuth2": [
+                            "realms:read"
+                        ]
+                    }
+                ],
+                "x-group": "admin"
+            }
+        },
+        "/v1/realms/{realm}/theme-assets/{name}": {
+            "get": {
+                "operationId": "v1.realms.theme-assets.show",
+                "summary": "Show a theme file",
+                "tags": [
+                    "Admin API"
+                ],
+                "parameters": [
+                    {
+                        "name": "realm",
+                        "in": "path",
+                        "required": true,
+                        "description": "The realm slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RealmThemeAssetData"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-RateLimit-Limit": {
+                                "description": "The maximum number of requests allowed in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            },
+                            "X-RateLimit-Remaining": {
+                                "description": "The number of requests left in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
+                    },
+                    "401": {
+                        "description": "The access token is missing, expired, or not addressed to this API.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "The RFC 6749 error code.",
+                                            "enum": [
+                                                "invalid_token"
+                                            ]
+                                        },
+                                        "error_description": {
+                                            "type": "string",
+                                            "description": "A human readable explanation."
+                                        }
+                                    },
+                                    "required": [
+                                        "error",
+                                        "error_description"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The access token does not grant realms:read.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "The RFC 6749 error code.",
+                                            "enum": [
+                                                "insufficient_scope"
+                                            ]
+                                        },
+                                        "error_description": {
+                                            "type": "string",
+                                            "description": "A human readable explanation."
+                                        }
+                                    },
+                                    "required": [
+                                        "error",
+                                        "error_description"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminOAuth2": [
+                            "realms:read"
+                        ]
+                    }
+                ],
+                "x-group": "admin"
+            },
+            "put": {
+                "operationId": "v1.realms.theme-assets.update",
+                "description": "The request body is the file itself. Its name decides its type: PNG, JPEG,\nWebP, SVG or WOFF2, up to 5 MB. Uploading the same bytes again changes\nnothing, and new bytes replace the file. A theme setting names it as\n`asset:<name>`.",
+                "summary": "Upload a theme file",
+                "tags": [
+                    "Admin API"
+                ],
+                "parameters": [
+                    {
+                        "name": "realm",
+                        "in": "path",
+                        "required": true,
+                        "description": "The realm slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/RealmThemeAssetData"
+                                        }
+                                    },
+                                    "required": [
+                                        "data"
+                                    ]
+                                }
+                            }
+                        },
+                        "headers": {
+                            "X-RateLimit-Limit": {
+                                "description": "The maximum number of requests allowed in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            },
+                            "X-RateLimit-Remaining": {
+                                "description": "The number of requests left in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
+                    },
+                    "401": {
+                        "description": "The access token is missing, expired, or not addressed to this API.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "The RFC 6749 error code.",
+                                            "enum": [
+                                                "invalid_token"
+                                            ]
+                                        },
+                                        "error_description": {
+                                            "type": "string",
+                                            "description": "A human readable explanation."
+                                        }
+                                    },
+                                    "required": [
+                                        "error",
+                                        "error_description"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The access token does not grant realms:write.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "The RFC 6749 error code.",
+                                            "enum": [
+                                                "insufficient_scope"
+                                            ]
+                                        },
+                                        "error_description": {
+                                            "type": "string",
+                                            "description": "A human readable explanation."
+                                        }
+                                    },
+                                    "required": [
+                                        "error",
+                                        "error_description"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "adminOAuth2": [
+                            "realms:write"
+                        ]
+                    }
+                ],
+                "x-group": "admin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/octet-stream": {
+                            "schema": {
+                                "type": "string",
+                                "format": "binary"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "v1.realms.theme-assets.destroy",
+                "description": "A theme setting that still names the file is left as it is and renders\nwithout it.",
+                "summary": "Delete a theme file",
+                "tags": [
+                    "Admin API"
+                ],
+                "parameters": [
+                    {
+                        "name": "realm",
+                        "in": "path",
+                        "required": true,
+                        "description": "The realm slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "name",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content",
+                        "headers": {
+                            "X-RateLimit-Limit": {
+                                "description": "The maximum number of requests allowed in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            },
+                            "X-RateLimit-Remaining": {
+                                "description": "The number of requests left in the current window.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
+                    },
+                    "401": {
+                        "description": "The access token is missing, expired, or not addressed to this API.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "The RFC 6749 error code.",
+                                            "enum": [
+                                                "invalid_token"
+                                            ]
+                                        },
+                                        "error_description": {
+                                            "type": "string",
+                                            "description": "A human readable explanation."
+                                        }
+                                    },
+                                    "required": [
+                                        "error",
+                                        "error_description"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "The access token does not grant realms:write.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "The RFC 6749 error code.",
+                                            "enum": [
+                                                "insufficient_scope"
+                                            ]
+                                        },
+                                        "error_description": {
+                                            "type": "string",
+                                            "description": "A human readable explanation."
+                                        }
+                                    },
+                                    "required": [
+                                        "error",
+                                        "error_description"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -1264,6 +1923,10 @@
                     "settings": {
                         "description": "The realm’s policy. Settings left out follow the instance defaults.",
                         "$ref": "#/components/schemas/RealmSettingsPatch"
+                    },
+                    "theme": {
+                        "description": "How the realm looks to its users. Left out, it looks like the instance.",
+                        "$ref": "#/components/schemas/RealmThemePatch"
                     }
                 },
                 "required": [
@@ -2201,6 +2864,10 @@
                             "null"
                         ],
                         "description": "When the realm was last changed."
+                    },
+                    "theme": {
+                        "description": "How the realm looks to its users.",
+                        "$ref": "#/components/schemas/RealmTheme"
                     }
                 },
                 "required": [
@@ -2210,7 +2877,8 @@
                     "issuer",
                     "domain_status",
                     "master",
-                    "settings"
+                    "settings",
+                    "theme"
                 ],
                 "title": "RealmData"
             },
@@ -3022,6 +3690,10 @@
                     "settings": {
                         "description": "Any subset of the realm’s policy; settings left out keep their current value.",
                         "$ref": "#/components/schemas/RealmSettingsPatch"
+                    },
+                    "theme": {
+                        "description": "Any subset of how the realm looks to its users; what is left out keeps its current value.",
+                        "$ref": "#/components/schemas/RealmThemePatch"
                     }
                 },
                 "title": "UpdateRealmData"
@@ -3062,6 +3734,123 @@
                     }
                 },
                 "title": "UpdateSocialProviderData"
+            },
+            "RealmAppearance": {
+                "type": "string",
+                "enum": [
+                    "system",
+                    "light",
+                    "dark"
+                ],
+                "title": "RealmAppearance"
+            },
+            "RealmTheme": {
+                "type": "object",
+                "properties": {
+                    "appearance": {
+                        "description": "`system` lets each visitor choose; `light` and `dark` fix the mode for the whole realm.",
+                        "$ref": "#/components/schemas/RealmAppearance"
+                    },
+                    "values": {
+                        "type": "array",
+                        "description": "The theme settings by name: Lattice tokens such as `--lt-primary` and settings such as `logo-url`.",
+                        "items": {
+                            "type": "string"
+                        },
+                        "minItems": 1
+                    },
+                    "font_faces": {
+                        "type": "array",
+                        "description": "The font files the font stacks name.",
+                        "items": {
+                            "$ref": "#/components/schemas/RealmThemeFontFace"
+                        }
+                    }
+                },
+                "title": "RealmTheme"
+            },
+            "RealmThemeAssetData": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The file's name. A theme setting refers to it as `asset:<name>`."
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "The address the file is served from on the realm's host."
+                    },
+                    "mime_type": {
+                        "type": "string",
+                        "description": "The type the file is served with, taken from its name."
+                    },
+                    "size": {
+                        "type": "number",
+                        "description": "The file's size in bytes."
+                    },
+                    "sha256": {
+                        "type": "string",
+                        "description": "The SHA-256 of the file's contents."
+                    }
+                },
+                "required": [
+                    "name",
+                    "url",
+                    "mime_type",
+                    "size",
+                    "sha256"
+                ],
+                "title": "RealmThemeAssetData"
+            },
+            "RealmThemeFontFace": {
+                "type": "object",
+                "properties": {
+                    "family": {
+                        "type": "string",
+                        "description": "The font family this file belongs to, as the font stack settings name it."
+                    },
+                    "file": {
+                        "type": "string",
+                        "description": "An `https` URL, or `asset:<name>` for a file uploaded to this realm."
+                    },
+                    "weight": {
+                        "type": "number",
+                        "description": "The weight the file holds, from 1 to 1000."
+                    },
+                    "style": {
+                        "type": "string",
+                        "description": "The style the file holds: `normal` or `italic`."
+                    }
+                },
+                "required": [
+                    "family",
+                    "file"
+                ],
+                "title": "RealmThemeFontFace"
+            },
+            "RealmThemePatch": {
+                "type": "object",
+                "properties": {
+                    "appearance": {
+                        "type": "string",
+                        "description": "`system` lets each visitor choose; `light` and `dark` fix the mode for the whole realm."
+                    },
+                    "values": {
+                        "type": "array",
+                        "description": "Any subset of the theme settings by name. Settings left out keep their value; `null` clears one.",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "font_faces": {
+                        "type": "array",
+                        "description": "The font files the font stacks name. Replaces the whole list.",
+                        "items": {
+                            "$ref": "#/components/schemas/RealmThemeFontFace"
+                        }
+                    }
+                },
+                "title": "RealmThemePatch"
             }
         },
         "responses": {

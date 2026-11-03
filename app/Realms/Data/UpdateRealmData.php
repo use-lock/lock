@@ -29,5 +29,7 @@ final class UpdateRealmData extends ApiData
         public Optional|string $domain,
         #[SpecProperty('Any subset of the realm’s policy; settings left out keep their current value.')]
         public Optional|RealmSettingsPatch $settings,
+        #[SpecProperty('Any subset of how the realm looks to its users; what is left out keeps its current value.')]
+        public Optional|RealmThemePatch $theme,
     ) {}
 }

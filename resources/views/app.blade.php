@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark']) @isset($realmThemeStylesheet) data-realm-theme @endisset @isset($forcedAppearance) data-forced-appearance="{{ $forcedAppearance }}" @endisset>
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="application-name" content="{{ config('app.name') }}">
 
         <script>
             (function() {
@@ -29,8 +30,16 @@
             }
         </style>
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        @isset($realmThemeStylesheet)
+            <style>{!! $realmThemeStylesheet !!}</style>
+        @endisset
+
+        @if ($realmFavicon ?? null)
+            <link rel="icon" href="{{ $realmFavicon }}">
+        @else
+            <link rel="icon" href="/favicon.ico" sizes="any">
+            <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        @endif
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
         @fonts

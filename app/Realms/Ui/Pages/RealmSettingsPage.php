@@ -11,6 +11,7 @@ use App\Realms\Models\Realm;
 use App\Realms\Ui\Actions\CheckRealmDomainAction;
 use App\Realms\Ui\Actions\CreateSocialProviderAction;
 use App\Realms\Ui\Concerns\BuildsRealmSettingRows;
+use App\Realms\Ui\Concerns\BuildsRealmThemeRows;
 use App\Realms\Ui\Concerns\OpensRealmDeletion;
 use App\Realms\Ui\Concerns\PresentsRealmDomainStatus;
 use App\Realms\Ui\Forms\UpdateRealmDomainForm;
@@ -46,6 +47,7 @@ use Lattice\Ui\PageSchema;
 final class RealmSettingsPage extends AdminPage
 {
     use BuildsRealmSettingRows;
+    use BuildsRealmThemeRows;
     use OpensRealmDeletion;
     use PresentsRealmDomainStatus;
 
@@ -77,6 +79,9 @@ final class RealmSettingsPage extends AdminPage
                                 fn (RealmSettingSection $section): Tab => $this->sectionTab($realm, $section, $manages),
                                 RealmSettingSection::cases(),
                             ),
+                            Tab::make('design', __('realms.sections.design'))
+                                ->visible($manages && ! $realm->isMaster())
+                                ->schema($manages && ! $realm->isMaster() ? $this->themeCards($realm) : []),
                         ]),
                 ],
                 width: Width::Large,

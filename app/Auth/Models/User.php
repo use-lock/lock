@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Auth\Models;
 
 use App\Admin\Enums\ManagementScope;
+use App\Auth\Notifications\RealmResetPassword;
+use App\Auth\Notifications\RealmVerifyEmail;
 use App\Realms\Models\Realm;
 use App\Resources\Models\ResourceScope;
 use App\Roles\Models\Role;
@@ -165,6 +167,19 @@ final class User extends Authenticatable implements HasLocalePreference, MustVer
             ->map(fn (ResourceScope $scope): string => $scope->value)
             ->unique()
             ->values();
+    }
+
+    /**
+     * @param  string  $token
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new RealmResetPassword($token));
+    }
+
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new RealmVerifyEmail);
     }
 
     public function preferredLocale(): ?string

@@ -5,10 +5,12 @@ namespace App\Realms\Actions;
 
 use App\Realms\Data\CreateRealmData;
 use App\Realms\Data\RealmSettings;
+use App\Realms\Data\RealmTheme;
 use App\Realms\Enums\RealmAdminEvent;
 use App\Realms\Models\Realm;
 use App\Realms\Support\RealmConfiguration;
 use App\Realms\Support\RealmDomain;
+use App\Realms\Support\RealmThemeConfiguration;
 use App\Shared\Audit\Audit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -37,13 +39,15 @@ final readonly class CreateRealm
 
         $settings = $this->resolveSettings($data);
         $deviations = $settings->deviations();
+        $theme = $data->theme instanceof Optional ? new RealmTheme : RealmThemeConfiguration::apply(new RealmTheme, $data->theme);
 
-        $realm = DB::transaction(function () use ($data, $settings, $deviations): Realm {
+        $realm = DB::transaction(function () use ($data, $settings, $deviations, $theme): Realm {
             $realm = Realm::create([
                 'name' => $data->name,
                 'slug' => $data->slug,
                 'domain' => $data->domain,
                 'settings' => $settings,
+                'theme' => $theme,
             ]);
 
             $realm->runAsCurrent(fn () => $this->store->rotate($this->keys->generate()));

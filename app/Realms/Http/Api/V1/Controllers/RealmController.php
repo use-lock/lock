@@ -107,7 +107,7 @@ final readonly class RealmController
             $errors = [];
 
             foreach ($exception->errors() as $key => $messages) {
-                $errors[in_array($key, ['name', 'slug', 'domain'], true) ? $key : 'settings.'.$key] = $messages;
+                $errors[in_array($key, ['name', 'slug', 'domain'], true) || str_starts_with($key, 'theme') ? $key : 'settings.'.$key] = $messages;
             }
 
             throw ValidationException::withMessages($errors);

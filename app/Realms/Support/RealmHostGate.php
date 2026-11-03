@@ -33,6 +33,11 @@ final class RealmHostGate
             'passkeys.allowed_origins' => [$realm->origin()],
         ]);
 
+        // Names the page title, the account page and the authenticator entry.
+        if (! $realm->isMaster() && $realm->hasTheme()) {
+            config(['app.name' => $realm->name]);
+        }
+
         // A realm's sign-in pages load their translations from its own host.
         if ($realm->isMaster() || ResolveRealm::appliesTo($route) || $route->named('i18next.*')) {
             return;

@@ -1,0 +1,192 @@
+/*
+ * The look a realm's theme gives its sign-in screens. These classes only exist
+ * on a themed realm's auth layout, so an unthemed page never matches, and every
+ * variable falls back with revert-layer: a theme that leaves a setting out keeps
+ * what Lattice declares for it. App\Realms\Support\RealmThemeStylesheet writes
+ * the variables.
+ *
+ * Lattice marks a button's variant only through its token utilities, so those
+ * classes are what tells a primary button from a secondary one here.
+ */
+
+.lock-auth-shell {
+    padding: 1.75rem 1rem;
+    background-color: var(--lock-background-color, transparent);
+    background-image: var(--lock-background-scrim, none), var(--lock-background-image, none);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: var(--lock-background-fit, cover);
+}
+
+.lock-auth-logo {
+    width: var(--lock-logo-width, 16rem);
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 0;
+}
+
+.lock-auth-panel {
+    box-sizing: border-box;
+    max-width: var(--lock-panel-width, revert-layer);
+    padding: var(--lock-panel-padding, var(--lt-gutter));
+    border: var(--lock-panel-border-width, 1px) solid var(--lt-border);
+    border-radius: var(--lt-radius);
+    background-color: var(--lt-surface);
+    color: var(--lt-surface-fg);
+    backdrop-filter: blur(var(--lock-panel-blur, 0));
+}
+
+.lock-auth-panel [data-test="lattice-page-container"] {
+    padding: 0;
+}
+
+/* The divider's label masks its line with the page ground, which shows as a box on a panel. */
+.lock-auth-panel span.bg-lt-bg {
+    background-color: var(--lt-surface);
+}
+
+.lock-auth-card [data-slot="heading"] {
+    font-family: var(--lt-font-display);
+    font-size: var(--lock-heading-size, revert-layer);
+    font-synthesis-weight: none;
+    letter-spacing: var(--lock-heading-tracking, revert-layer);
+    line-height: 1;
+    text-shadow: var(--lock-text-shadow-heading, revert-layer);
+}
+
+.lock-auth-card [data-slot="label"]:not([data-slot="checkbox"] ~ *) {
+    color: var(--lock-label-color, revert-layer);
+    font: var(--lock-label-font, revert-layer);
+    letter-spacing: var(--lock-label-tracking, revert-layer);
+    text-transform: var(--lock-label-transform, revert-layer);
+}
+
+.lock-auth-card [data-slot="button"] {
+    height: auto;
+    min-height: var(--lock-button-height, var(--lt-control-h-md));
+    padding-block: 0.5rem;
+    padding-inline: var(--lock-button-padding-x, revert-layer);
+    font-family: var(--lt-font-display);
+    font-size: var(--lock-button-font-size, revert-layer);
+    font-synthesis-weight: none;
+    letter-spacing: var(--lock-button-tracking, revert-layer);
+    line-height: 1;
+    text-transform: var(--lock-button-transform, revert-layer);
+    white-space: normal;
+}
+
+.lock-auth-card [data-slot="button"].bg-lt-primary {
+    border: 1px solid var(--lock-button-primary-border, transparent);
+    background-image: var(--lock-button-primary-fill, none);
+    box-shadow: var(--lock-button-primary-shadow, revert-layer);
+    transition:
+        filter 0.15s,
+        transform 0.1s,
+        box-shadow 0.15s;
+}
+
+.lock-auth-card [data-slot="button"].bg-lt-primary:hover:not(:disabled) {
+    box-shadow: var(--lock-button-primary-shadow-hover, revert-layer);
+    filter: var(--lock-button-hover-filter, revert-layer);
+}
+
+.lock-auth-card [data-slot="button"].bg-lt-primary:active:not(:disabled) {
+    filter: var(--lock-button-active-filter, revert-layer);
+    transform: translateY(1px);
+}
+
+.lock-auth-card [data-slot="button"].bg-lt-primary:disabled {
+    box-shadow: var(--lock-button-disabled-shadow, revert-layer);
+    filter: var(--lock-button-disabled-filter, revert-layer);
+}
+
+.lock-auth-card [data-slot="button"]:is(.bg-lt-secondary, .border-lt-input) {
+    border: 1px solid var(--lock-button-secondary-border, var(--lt-input));
+    background-color: var(--lt-secondary);
+    box-shadow: var(--lock-button-secondary-shadow, revert-layer);
+    color: var(--lt-secondary-fg);
+    backdrop-filter: blur(var(--lock-button-secondary-blur, 0));
+}
+
+.lock-auth-card [data-slot="button"]:is(.bg-lt-secondary, .border-lt-input):hover:not(:disabled) {
+    border-color: var(--lock-button-secondary-border-hover, var(--lt-ring));
+    background-color: var(--lt-secondary-hover);
+    color: var(--lt-secondary-fg);
+}
+
+.lock-auth-card [data-slot="input"] {
+    border-width: var(--lock-input-border-edge, revert-layer);
+    border-radius: var(--lock-input-radius, revert-layer);
+    background-color: var(--lock-input-background, revert-layer);
+    box-shadow: var(--lock-input-shadow, revert-layer);
+    caret-color: var(--lock-input-caret, revert-layer);
+    font-size: var(--lock-input-font-size, revert-layer);
+}
+
+.lock-auth-card [data-slot="input"]::placeholder {
+    color: var(--lock-input-placeholder, revert-layer);
+}
+
+.lock-auth-card [data-slot="input"]:focus {
+    border-color: var(--lock-input-border-focus, revert-layer);
+    background-color: var(--lock-input-background-focus, revert-layer);
+}
+
+.lock-auth-card [data-slot="input"][aria-invalid="true"] {
+    border-color: var(--lt-danger);
+    background-color: var(--lock-input-background-error, revert-layer);
+}
+
+.lock-auth-card [data-slot="checkbox"] {
+    background-color: var(--lock-input-background, revert-layer);
+}
+
+.lock-auth-card [data-slot="checkbox"][data-state="checked"] {
+    border-color: var(--lock-button-primary-border, revert-layer);
+    background-image: var(--lock-button-primary-fill, none);
+}
+
+.lock-auth-card
+    :is([data-slot="button"], [data-slot="input"], [data-slot="checkbox"], a):focus-visible {
+    outline: var(--lt-ring-width) solid var(--lt-ring);
+    outline-offset: var(--lt-ring-offset);
+}
+
+.lock-auth-card a {
+    color: var(--lock-link-inline-color, revert-layer);
+    text-decoration-color: currentColor;
+}
+
+.lock-auth-card a:hover {
+    color: var(--lock-link-inline-hover, revert-layer);
+}
+
+/* A link in a field's label row stands alone, like "Forgot your password?". */
+.lock-auth-card :has(> [data-slot="label"]) a {
+    color: var(--lt-muted-fg);
+    font: var(--lock-link-action-font, revert-layer);
+    letter-spacing: var(--lock-link-action-tracking, revert-layer);
+    text-decoration: none;
+    text-transform: var(--lock-label-transform, revert-layer);
+}
+
+.lock-auth-card :has(> [data-slot="label"]) a:hover {
+    color: var(--lock-link-inline-hover, revert-layer);
+}
+
+.lock-auth-card :is(div.text-lt-success, p.text-lt-danger) {
+    text-shadow: var(--lock-text-shadow-small, revert-layer);
+}
+
+.lock-auth-card :is(div.text-lt-success, p.text-lt-danger)::before {
+    display: var(--lock-status-dot, none);
+    width: 7px;
+    height: 7px;
+    margin-inline-end: 9px;
+    border-radius: 50%;
+    background-color: currentColor;
+    box-shadow: 0 0 10px currentColor;
+    content: "";
+    vertical-align: 0.12em;
+}

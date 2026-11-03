@@ -3184,6 +3184,10 @@
                     "settings": {
                         "description": "The realm’s policy. Settings left out follow the instance defaults.",
                         "$ref": "#/components/schemas/RealmSettingsPatch"
+                    },
+                    "theme": {
+                        "description": "How the realm looks to its users. Left out, it looks like the instance.",
+                        "$ref": "#/components/schemas/RealmThemePatch"
                     }
                 },
                 "required": [
@@ -4121,6 +4125,10 @@
                             "null"
                         ],
                         "description": "When the realm was last changed."
+                    },
+                    "theme": {
+                        "description": "How the realm looks to its users.",
+                        "$ref": "#/components/schemas/RealmTheme"
                     }
                 },
                 "required": [
@@ -4130,7 +4138,8 @@
                     "issuer",
                     "domain_status",
                     "master",
-                    "settings"
+                    "settings",
+                    "theme"
                 ],
                 "title": "RealmData"
             },
@@ -4942,6 +4951,10 @@
                     "settings": {
                         "description": "Any subset of the realm’s policy; settings left out keep their current value.",
                         "$ref": "#/components/schemas/RealmSettingsPatch"
+                    },
+                    "theme": {
+                        "description": "Any subset of how the realm looks to its users; what is left out keeps its current value.",
+                        "$ref": "#/components/schemas/RealmThemePatch"
                     }
                 },
                 "title": "UpdateRealmData"
@@ -4982,6 +4995,123 @@
                     }
                 },
                 "title": "UpdateSocialProviderData"
+            },
+            "RealmAppearance": {
+                "type": "string",
+                "enum": [
+                    "system",
+                    "light",
+                    "dark"
+                ],
+                "title": "RealmAppearance"
+            },
+            "RealmTheme": {
+                "type": "object",
+                "properties": {
+                    "appearance": {
+                        "description": "`system` lets each visitor choose; `light` and `dark` fix the mode for the whole realm.",
+                        "$ref": "#/components/schemas/RealmAppearance"
+                    },
+                    "values": {
+                        "type": "array",
+                        "description": "The theme settings by name: Lattice tokens such as `--lt-primary` and settings such as `logo-url`.",
+                        "items": {
+                            "type": "string"
+                        },
+                        "minItems": 1
+                    },
+                    "font_faces": {
+                        "type": "array",
+                        "description": "The font files the font stacks name.",
+                        "items": {
+                            "$ref": "#/components/schemas/RealmThemeFontFace"
+                        }
+                    }
+                },
+                "title": "RealmTheme"
+            },
+            "RealmThemeAssetData": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The file's name. A theme setting refers to it as `asset:<name>`."
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "The address the file is served from on the realm's host."
+                    },
+                    "mime_type": {
+                        "type": "string",
+                        "description": "The type the file is served with, taken from its name."
+                    },
+                    "size": {
+                        "type": "number",
+                        "description": "The file's size in bytes."
+                    },
+                    "sha256": {
+                        "type": "string",
+                        "description": "The SHA-256 of the file's contents."
+                    }
+                },
+                "required": [
+                    "name",
+                    "url",
+                    "mime_type",
+                    "size",
+                    "sha256"
+                ],
+                "title": "RealmThemeAssetData"
+            },
+            "RealmThemeFontFace": {
+                "type": "object",
+                "properties": {
+                    "family": {
+                        "type": "string",
+                        "description": "The font family this file belongs to, as the font stack settings name it."
+                    },
+                    "file": {
+                        "type": "string",
+                        "description": "An `https` URL, or `asset:<name>` for a file uploaded to this realm."
+                    },
+                    "weight": {
+                        "type": "number",
+                        "description": "The weight the file holds, from 1 to 1000."
+                    },
+                    "style": {
+                        "type": "string",
+                        "description": "The style the file holds: `normal` or `italic`."
+                    }
+                },
+                "required": [
+                    "family",
+                    "file"
+                ],
+                "title": "RealmThemeFontFace"
+            },
+            "RealmThemePatch": {
+                "type": "object",
+                "properties": {
+                    "appearance": {
+                        "type": "string",
+                        "description": "`system` lets each visitor choose; `light` and `dark` fix the mode for the whole realm."
+                    },
+                    "values": {
+                        "type": "array",
+                        "description": "Any subset of the theme settings by name. Settings left out keep their value; `null` clears one.",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "font_faces": {
+                        "type": "array",
+                        "description": "The font files the font stacks name. Replaces the whole list.",
+                        "items": {
+                            "$ref": "#/components/schemas/RealmThemeFontFace"
+                        }
+                    }
+                },
+                "title": "RealmThemePatch"
             }
         },
         "responses": {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Realms\Http\Api\V1\Resources;
 
 use App\Realms\Data\RealmSettings;
+use App\Realms\Data\RealmTheme;
 use App\Realms\Enums\RealmDomainStatus;
 use App\Realms\Models\Realm;
 use App\Shared\Data\Data;
@@ -38,6 +39,8 @@ final class RealmData extends Data
         public bool $master,
         #[SpecProperty('The realm’s own policy.')]
         public RealmSettings $settings,
+        #[SpecProperty('How the realm looks to its users.')]
+        public RealmTheme $theme,
         #[SpecProperty('When the realm was created.')]
         public ?CarbonImmutable $createdAt,
         #[SpecProperty('When the realm was last changed.')]
@@ -57,6 +60,7 @@ final class RealmData extends Data
             domainCheckError: $realm->domain_check_error,
             master: $realm->isMaster(),
             settings: $realm->settings,
+            theme: $realm->theme,
             createdAt: $realm->created_at,
             updatedAt: $realm->updated_at,
         );

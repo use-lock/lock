@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tests\Helpers;
 
 use App\Realms\Actions\CreateRealm;
+use App\Realms\Actions\UpdateRealm;
 use App\Realms\Data\CreateRealmData;
+use App\Realms\Data\UpdateRealmData;
 use App\Realms\Models\Realm;
 use App\Realms\Support\DomainCheckToken;
 use Illuminate\Http\Client\Request;
@@ -65,4 +67,52 @@ function createRealm(string $name, string $slug, string $domain, array $settings
         'domain' => $domain,
         'settings' => $settings,
     ]));
+}
+
+/**
+ * @param  array<string, mixed>  $theme
+ */
+function themeRealm(Realm $realm, array $theme): Realm
+{
+    return app(UpdateRealm::class)->handle($realm, UpdateRealmData::from(['theme' => $theme]));
+}
+
+/**
+ * One value of every shape a theme accepts, none of them any real realm's.
+ *
+ * @return array<string, string>
+ */
+function fullThemeValues(): array
+{
+    return [
+        '--lt-bg' => '#101418',
+        '--lt-fg' => '#eef2f6',
+        '--lt-surface' => 'rgba(10, 12, 14, 0.8)',
+        '--lt-primary' => '#3366cc',
+        '--lt-primary-fg' => '#ffffff',
+        '--lt-radius' => '3px',
+        '--lt-font-sans' => "'Example Text', Georgia, serif",
+        '--lt-font-display' => "'Example Display', Georgia, serif",
+        '--lt-shadow-inner' => 'none',
+        'logo-url' => 'asset:wordmark.svg',
+        'logo-alt' => 'Emberfall',
+        'logo-width' => '280px',
+        'background-image-url' => 'https://cdn.example.com/art/key.webp',
+        'background-color' => '#050608',
+        'background-fit' => 'cover',
+        'background-scrim' => 'radial-gradient(80% 70% at 50% 40%, rgba(1, 2, 3, 0.1) 20%, rgba(1, 2, 3, 0.7) 100%), linear-gradient(rgba(1, 2, 3, 0.3), rgba(1, 2, 3, 0.3))',
+        'panel-blur' => '4px',
+        'panel-width' => '460px',
+        'text-shadow-heading' => '0 2px 12px #000',
+        'label-font' => '700 12px/1 var(--lt-font-sans)',
+        'label-transform' => 'uppercase',
+        'button-primary-fill' => 'linear-gradient(180deg, #4477dd 0, #3366cc 50%, #2255aa 100%)',
+        'button-primary-shadow' => 'inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 0 1px #112244, 0 8px 24px rgba(50, 100, 200, 0.4)',
+        'button-hover-filter' => 'brightness(1.1)',
+        'button-disabled-filter' => 'grayscale(0.5) brightness(0.7)',
+        'input-border-style' => 'underline',
+        'input-border-width' => '2px',
+        'mail-from-name' => 'Emberfall',
+        'mail-from-address' => 'hello@emberfall.example',
+    ];
 }

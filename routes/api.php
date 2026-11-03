@@ -6,6 +6,7 @@ use App\Admin\Enums\ManagementScope;
 use App\Admin\Http\Middleware\EnsureScopes;
 use App\Clients\Http\Api\V1\Controllers\ClientController;
 use App\Realms\Http\Api\V1\Controllers\RealmController;
+use App\Realms\Http\Api\V1\Controllers\RealmThemeAssetController;
 use App\Realms\Http\Api\V1\Controllers\SocialProviderController;
 use App\Resources\Http\Api\V1\Controllers\ResourceController;
 use Illuminate\Support\Facades\Route;
@@ -27,12 +28,16 @@ Route::prefix('v1')
             Route::middleware(EnsureScopes::using(ManagementScope::RealmsRead))->group(function (): void {
                 Route::get('realms', [RealmController::class, 'index'])->name('realms.index');
                 Route::get('realms/{realm}', [RealmController::class, 'show'])->name('realms.show');
+                Route::get('realms/{realm}/theme-assets', [RealmThemeAssetController::class, 'index'])->name('realms.theme-assets.index');
+                Route::get('realms/{realm}/theme-assets/{name}', [RealmThemeAssetController::class, 'show'])->name('realms.theme-assets.show');
             });
 
             Route::middleware(EnsureScopes::using(ManagementScope::RealmsWrite))->group(function (): void {
                 Route::post('realms', [RealmController::class, 'store'])->name('realms.store');
                 Route::patch('realms/{realm}', [RealmController::class, 'update'])->name('realms.update');
                 Route::delete('realms/{realm}', [RealmController::class, 'destroy'])->name('realms.destroy');
+                Route::put('realms/{realm}/theme-assets/{name}', [RealmThemeAssetController::class, 'update'])->name('realms.theme-assets.update');
+                Route::delete('realms/{realm}/theme-assets/{name}', [RealmThemeAssetController::class, 'destroy'])->name('realms.theme-assets.destroy');
             });
         });
 
