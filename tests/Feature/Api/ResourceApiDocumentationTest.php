@@ -6,6 +6,8 @@ use App\Admin\Enums\ManagementScope;
 use Bambamboole\Spectacular\OpenApi\GroupedOpenApiDocuments;
 use Dedoc\Scramble\Generator;
 
+const ADMIN_API_PATHS = ['/v1/realms', '/v1/realms/{realm}', '/v1/realms/{realm}/theme-assets', '/v1/realms/{realm}/theme-assets/{name}'];
+
 it('documents resource operations and nested scope commands for the playground', function () {
     $document = app(Generator::class)();
 
@@ -17,7 +19,7 @@ it('documents resource operations and nested scope commands for the playground',
             continue;
         }
 
-        $category = in_array($path, ['/v1/realms', '/v1/realms/{realm}'], true) ? 'Admin API' : 'Management API';
+        $category = in_array($path, ADMIN_API_PATHS, true) ? 'Admin API' : 'Management API';
 
         foreach ($operations as $method => $operation) {
             if (in_array($method, ['get', 'post', 'put', 'patch', 'delete'], true)) {
@@ -65,7 +67,7 @@ it('separates admin management and auth documentation', function () {
             }
 
             $group = str_starts_with($path, '/v1/')
-                ? (in_array($path, ['/v1/realms', '/v1/realms/{realm}'], true) ? 'admin' : 'management')
+                ? (in_array($path, ADMIN_API_PATHS, true) ? 'admin' : 'management')
                 : 'auth';
 
             expect($operation['x-group'] ?? null)->toBe($group)
@@ -75,7 +77,7 @@ it('separates admin management and auth documentation', function () {
 
     expect($document['paths']['/v1/realms']['get']['security'])
         ->toBe([['adminOAuth2' => ['realms:read']]])
-        ->and($groups['admin']['paths'])->toHaveKeys(['/v1/realms', '/v1/realms/{realm}'])->toHaveCount(2)
+        ->and($groups['admin']['paths'])->toHaveKeys(ADMIN_API_PATHS)->toHaveCount(count(ADMIN_API_PATHS))
         ->and($groups['management']['paths'])->toHaveKeys(['/v1/realms/{realm}/clients', '/v1/realms/{realm}/resources', '/v1/realms/{realm}/social-providers'])
         ->not->toHaveKeys(['/v1/realms', '/oauth/token'])
         ->and($groups['auth']['paths'])->toHaveKeys(['/oauth/token', '/oauth/userinfo', '/.well-known/openid-configuration'])

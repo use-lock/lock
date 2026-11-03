@@ -13,7 +13,11 @@ import { createRoot } from "react-dom/client";
 import sprite from "virtual:svg-sprite";
 import { i18nNamespaces, registry } from "@/registry";
 
-const applicationName = import.meta.env.VITE_APP_NAME || "Lock";
+// A themed realm carries its own name, which a value baked in at build time cannot know.
+const applicationName =
+    document.querySelector<HTMLMetaElement>('meta[name="application-name"]')?.content ||
+    import.meta.env.VITE_APP_NAME ||
+    "Lock";
 
 void createInertiaApp({
     title: (title) => (title ? `${title} - ${applicationName}` : applicationName),
@@ -47,4 +51,7 @@ void createInertiaApp({
     },
 });
 
-initializeAppearance();
+// It would reapply the mode stored in the browser over the one the realm fixes.
+if (!document.documentElement.dataset.forcedAppearance) {
+    initializeAppearance();
+}

@@ -5,8 +5,12 @@ namespace App\Realms\Models;
 
 use App\Auth\Models\User;
 use App\Realms\Casts\AsRealmSettings;
+use App\Realms\Casts\AsRealmTheme;
 use App\Realms\Data\RealmSettings;
+use App\Realms\Data\RealmTheme;
+use App\Realms\Enums\RealmAppearance;
 use App\Realms\Enums\RealmDomainStatus;
+use App\Realms\Support\RealmMailTheme;
 use App\Resources\Models\Resource;
 use App\Roles\Models\Role;
 use App\Shared\Resources\Contracts\ProvidesRealmResources;
@@ -20,6 +24,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Notifications\Messages\MailMessage;
 use Lock\Server\Clients\Models\Client;
 use Lock\Server\Shared\Realms\CurrentRealm;
 use Lock\Server\Shared\Realms\Realm as RealmContract;
@@ -48,12 +53,14 @@ use LogicException;
  * @property CarbonImmutable|null $domain_checked_at
  * @property string|null $domain_check_error
  * @property RealmSettings $settings
+ * @property RealmTheme $theme
  * @property string|null $first_party_client_id
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read Collection<int, User> $users
  * @property-read int|null $users_count
  * @property-read Collection<int, RealmSocialProvider> $socialProviders
+ * @property-read Collection<int, RealmThemeAsset> $themeAssets
  * @property-read Collection<int, Role> $roles
  * @property-read int|null $roles_count
  * @property-read Collection<int, \App\Resources\Models\Resource> $realmResources
@@ -71,7 +78,7 @@ use LogicException;
  *
  * @mixin \Eloquent
  */
-#[Fillable(['name', 'slug', 'domain', 'settings', 'first_party_client_id'])]
+#[Fillable(['name', 'slug', 'domain', 'settings', 'theme', 'first_party_client_id'])]
 #[RouteKey('slug')]
 final class Realm extends Model implements RealmContract
 {
@@ -84,6 +91,7 @@ final class Realm extends Model implements RealmContract
     protected $attributes = [
         'domain_status' => 'pending',
         'settings' => '{}',
+        'theme' => '{}',
     ];
 
     /**
@@ -201,6 +209,33 @@ final class Realm extends Model implements RealmContract
     }
 
     /**
+     * @return HasMany<RealmThemeAsset, $this>
+     */
+    public function themeAssets(): HasMany
+    {
+        return $this->hasMany(RealmThemeAsset::class);
+    }
+
+    public function hasTheme(): bool
+    {
+        return ! $this->theme->isEmpty();
+    }
+
+    /**
+     * The mode the realm fixes for every visitor; null while each chooses their
+     * own.
+     */
+    public function fixedAppearance(): ?string
+    {
+        return $this->theme->appearance === RealmAppearance::System ? null : $this->theme->appearance->value;
+    }
+
+    public function themeMail(MailMessage $message): MailMessage
+    {
+        return $this->hasTheme() ? RealmMailTheme::apply($message, $this) : $message;
+    }
+
+    /**
      * @return array<string, string>
      */
     protected function casts(): array
@@ -209,6 +244,7 @@ final class Realm extends Model implements RealmContract
             'domain_status' => RealmDomainStatus::class,
             'domain_checked_at' => 'datetime',
             'settings' => AsRealmSettings::class,
+            'theme' => AsRealmTheme::class,
         ];
     }
 

@@ -7,13 +7,17 @@ namespace App\Realms;
 use App\Admin\Enums\ManagementScope;
 use App\Realms\Models\Realm;
 use App\Realms\Models\RealmSocialProvider;
+use App\Realms\Models\RealmThemeAsset;
 use App\Realms\Support\DatabaseRealmRepository;
 use App\Realms\Support\RealmHostGate;
+use App\Realms\Support\RealmThemeViewComposer;
+use App\Realms\Ui\Layouts\RealmAuthLayout;
 use App\Realms\Ui\Pages\RealmSettingsPage;
 use App\Realms\Ui\Pages\RealmsPage;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Lattice\Core\Facades\Lattice;
 use Lattice\Ui\Components\MenuItem;
@@ -60,6 +64,12 @@ final class RealmsServiceProvider extends ServiceProvider
         );
 
         Lattice::context('socialProvider', fn (string $value): RealmSocialProvider => RealmSocialProvider::query()->findOrFail($value));
+        Lattice::context('themeAsset', fn (string $value): RealmThemeAsset => RealmThemeAsset::query()->findOrFail($value));
+
+        // An explicit registration wins over the package's discovered layout.
+        Lattice::layouts(RealmAuthLayout::class);
+
+        View::composer('app', RealmThemeViewComposer::class);
 
         Route::matched(fn (RouteMatched $event) => app(RealmHostGate::class)->guard($event->request, $event->route));
     }

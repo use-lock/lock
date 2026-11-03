@@ -69,6 +69,8 @@ realm domains, backups, and Coolify setup.
   recovery codes) and **passkeys**, with the Lattice auth UI integrated into `use-lock/server`.
 - **Realms** — the identity boundary, Keycloak-style. A user belongs to exactly one realm, an address identifies
   a different person in each, and every realm has its own OIDC issuer, clients and authentication settings.
+- **Realm themes** — a realm can set its own look for its sign-in screens, account page and emails, from the console,
+  the management API or the Pulumi provider.
 - **Admin console** — the `admin` realm's first-party UI: realm CRUD and configuration, user administration,
   global roles, and a cross-realm activity view.
 - **Audit logs** — separate trails for administrator changes and realm authentication events, with configurable retention.

@@ -32,5 +32,7 @@ final class CreateRealmData extends ApiData
         public string $domain,
         #[SpecProperty('The realm’s policy. Settings left out follow the instance defaults.')]
         public Optional|RealmSettingsPatch $settings,
+        #[SpecProperty('How the realm looks to its users. Left out, it looks like the instance.')]
+        public Optional|RealmThemePatch $theme,
     ) {}
 }

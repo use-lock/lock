@@ -6,10 +6,12 @@ namespace App\Realms\Actions;
 use App\Auth\Models\User;
 use App\Realms\Enums\RealmAdminEvent;
 use App\Realms\Models\Realm;
+use App\Realms\Models\RealmThemeAsset;
 use App\Shared\Audit\Audit;
 use App\Shared\Auth\Contracts\DeletesUser;
 use App\Shared\Realms\Events\RealmDeleting;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 final readonly class DeleteRealm
 {
@@ -18,7 +20,10 @@ final readonly class DeleteRealm
     /** The row goes for good, so a deleted realm's slug is free again. */
     public function handle(Realm $realm): void
     {
+        $files = $realm->themeAssets()->pluck('path')->all();
+
         DB::transaction(function () use ($realm): void {
+            $realm->themeAssets()->delete();
             $realm->roles()->delete();
             $realm->users()->eachById(function (User $user): void {
                 $this->deleteUser->handle($user);
@@ -30,5 +35,7 @@ final readonly class DeleteRealm
 
             Audit::record(RealmAdminEvent::RealmDeleted, $realm, context: ['name' => $realm->name, 'slug' => $realm->slug]);
         });
+
+        Storage::disk(RealmThemeAsset::DISK)->delete($files);
     }
 }

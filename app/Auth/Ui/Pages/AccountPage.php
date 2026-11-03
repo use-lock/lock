@@ -144,6 +144,7 @@ final class AccountPage extends Page
         return Card::make(__('user.preferences.heading'), __('user.preferences.subtitle'))->schema([
             DescriptionList::make('preference-rows')->bleed()->schema([
                 ComponentEntry::make('appearance', __('user.preferences.theme.label'), 'row-appearance')
+                    ->visible($user->realm->fixedAppearance() === null)
                     ->value(
                         SegmentedControl::make('appearance')
                             ->value($appearance)

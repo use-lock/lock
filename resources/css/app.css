@@ -2,6 +2,7 @@
 
 @import '@lattice-php/lattice/css';
 @import '@fontsource-variable/instrument-sans/wght.css';
+@import './realm-theme.css';
 
 @source '../views';
 @source '../../vendor/lattice-php/*/resources/js';

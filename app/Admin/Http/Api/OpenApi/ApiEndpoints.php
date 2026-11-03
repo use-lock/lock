@@ -28,10 +28,20 @@ final readonly class ApiEndpoints implements EndpointDefinition
                 'api.v1.realms.show',
                 'api.v1.realms.update',
                 'api.v1.realms.destroy',
+                'api.v1.realms.theme-assets.index',
+                'api.v1.realms.theme-assets.show',
+                'api.v1.realms.theme-assets.update',
+                'api.v1.realms.theme-assets.destroy',
             ], true) ? 'Admin API' : 'Management API';
 
+            // Raw bytes rather than a payload class, which is all Scramble can infer a body from.
+            $body = $name === 'api.v1.realms.theme-assets.update' ? ['requestBody' => [
+                'required' => true,
+                'content' => ['application/octet-stream' => ['schema' => ['type' => 'string', 'format' => 'binary']]],
+            ]] : [];
+
             foreach (array_diff($route->methods(), ['HEAD']) as $method) {
-                $endpoints[] = Endpoint::route($name, $method, ['tags' => [$category], 'x-group' => $category === 'Admin API' ? 'admin' : 'management']);
+                $endpoints[] = Endpoint::route($name, $method, ['tags' => [$category], 'x-group' => $category === 'Admin API' ? 'admin' : 'management', ...$body]);
             }
         }
 

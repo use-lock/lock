@@ -8,6 +8,7 @@ use App\Audit\Models\AdminEvent;
 use App\Auth\Actions\CreateRealmUser;
 use App\Auth\Enums\UserAdminEvent;
 use App\Auth\Models\User;
+use App\Auth\Notifications\RealmResetPassword;
 use App\Auth\Ui\Actions\BlockUserAction;
 use App\Auth\Ui\Actions\DeleteUserAction;
 use App\Auth\Ui\Actions\EndAllUserSessionsAction;
@@ -22,7 +23,6 @@ use App\Auth\Ui\Tables\UserSessionsTable;
 use App\Auth\Ui\Tables\UsersTable;
 use App\Realms\Models\Realm;
 use App\Roles\Models\Role;
-use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
@@ -89,7 +89,7 @@ test('a users-manage admin creates a user and invites them to set a password', f
 
     $user = $this->realm->users()->where('email', 'wanda@example.com')->sole();
 
-    Notification::assertSentTo($user, ResetPassword::class);
+    Notification::assertSentTo($user, RealmResetPassword::class);
     expect($user->hasVerifiedEmail())->toBeFalse()
         ->and(data_get(AdminEvent::global()->where('type', UserAdminEvent::UserCreated->type())->sole()->context, 'invited'))->toBeTrue();
 });

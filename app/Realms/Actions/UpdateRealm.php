@@ -7,8 +7,10 @@ use App\Realms\Data\UpdateRealmData;
 use App\Realms\Enums\RealmAdminEvent;
 use App\Realms\Models\Realm;
 use App\Realms\Support\RealmConfiguration;
+use App\Realms\Support\RealmThemeConfiguration;
 use App\Shared\Audit\Audit;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Spatie\LaravelData\Optional;
 
 final readonly class UpdateRealm
@@ -31,6 +33,7 @@ final readonly class UpdateRealm
 
             $before = $locked->domain;
             $this->applyConfiguration($locked, $data);
+            $this->applyTheme($locked, $data);
 
             if (! $data->domain instanceof Optional) {
                 $this->updateDomain->handle($locked, $data->domain);
@@ -83,6 +86,50 @@ final readonly class UpdateRealm
 
         $realm->name = $after['name'];
         $realm->settings = $settings;
+        $realm->save();
+
+        Audit::record(RealmAdminEvent::RealmUpdated, $realm, $realm, ['changes' => $changes]);
+    }
+
+    /**
+     * The administration realm serves the console, which keeps the instance's
+     * look: a theme there could leave it unreadable for the people who would
+     * have to fix it.
+     */
+    private function applyTheme(Realm $realm, UpdateRealmData $data): void
+    {
+        if ($data->theme instanceof Optional) {
+            return;
+        }
+
+        if ($realm->isMaster()) {
+            throw ValidationException::withMessages(['theme' => [__('realms.theme.errors.master')]]);
+        }
+
+        $before = $realm->theme;
+        $after = RealmThemeConfiguration::apply($before, $data->theme);
+
+        $changes = [];
+
+        if ($before->appearance !== $after->appearance) {
+            $changes['theme.appearance'] = ['old' => $before->appearance->value, 'new' => $after->appearance->value];
+        }
+
+        foreach (array_unique([...array_keys($before->values), ...array_keys($after->values)]) as $name) {
+            if ($before->value($name) !== $after->value($name)) {
+                $changes['theme.'.$name] = ['old' => $before->value($name), 'new' => $after->value($name)];
+            }
+        }
+
+        if ($before->toArray()['font_faces'] !== $after->toArray()['font_faces']) {
+            $changes['theme.font_faces'] = ['old' => $before->toArray()['font_faces'], 'new' => $after->toArray()['font_faces']];
+        }
+
+        if ($changes === []) {
+            return;
+        }
+
+        $realm->theme = $after;
         $realm->save();
 
         Audit::record(RealmAdminEvent::RealmUpdated, $realm, $realm, ['changes' => $changes]);

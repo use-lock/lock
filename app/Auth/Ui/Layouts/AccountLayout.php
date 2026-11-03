@@ -14,6 +14,7 @@ use Lattice\Core\Enums\ColorName;
 use Lattice\Layouts\Components\Outlet;
 use Lattice\Layouts\LayoutDefinition;
 use Lattice\Ui\Components\Callouts;
+use Lattice\Ui\Components\Link;
 use Lattice\Ui\Components\Stack;
 use Lattice\Ui\Components\Text;
 use Lattice\Ui\Components\Topbar;
@@ -51,7 +52,9 @@ final class AccountLayout extends LayoutDefinition
                             ->align(Align::Center)
                             ->width(Width::Auto)
                             ->gap(Gap::Medium)
-                            ->schema([
+                            ->schema($realm->hasTheme() ? [
+                                Link::make($realm->name, 'account-brand')->href($this->accountUrl()),
+                            ] : [
                                 BrandMark::wordmark('account-brand', $this->accountUrl()),
                                 Text::make('/')->size(Size::Sm)->color(ColorName::Muted)->visibleFrom(Breakpoint::Md),
                                 Text::make($realm->name, 'account-realm-name')->size(Size::Sm)->visibleFrom(Breakpoint::Md),
