@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/use-lock/lock/compare/v0.2.0...v0.3.0) (2026-11-03)
+
+
+### Features
+
+* let a realm set its own look ([#36](https://github.com/use-lock/lock/issues/36)) ([3daf91d](https://github.com/use-lock/lock/commit/3daf91d6b98fc303aacf641bdc3146bbd453c73e))
+
 ## [0.2.0](https://github.com/use-lock/lock/compare/v0.1.0...v0.2.0) (2026-10-26)
 
 

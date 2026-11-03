@@ -2,7 +2,7 @@
     "openapi": "3.1.2",
     "info": {
         "title": "Lock API",
-        "version": "0.2.0",
+        "version": "0.3.0",
         "description": "OAuth and OpenID Connect endpoints, discovery metadata, and the APIs for managing this Lock instance. Protocol endpoints are served on each realm’s own host.",
         "license": {
             "name": "MIT",
@@ -1050,12 +1050,6 @@
                             }
                         }
                     },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "429": {
-                        "$ref": "#/components/responses/ThrottleRequestsException"
-                    },
                     "401": {
                         "description": "The access token is missing, expired, or not addressed to this API.",
                         "content": {
@@ -1110,8 +1104,14 @@
                             }
                         }
                     },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
                     "422": {
                         "$ref": "#/components/responses/ValidationException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
                     }
                 },
                 "security": [
@@ -1183,12 +1183,6 @@
                             }
                         }
                     },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "429": {
-                        "$ref": "#/components/responses/ThrottleRequestsException"
-                    },
                     "401": {
                         "description": "The access token is missing, expired, or not addressed to this API.",
                         "content": {
@@ -1242,6 +1236,12 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
                     }
                 },
                 "security": [
@@ -1312,15 +1312,6 @@
                             }
                         }
                     },
-                    "422": {
-                        "$ref": "#/components/responses/ValidationException"
-                    },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "429": {
-                        "$ref": "#/components/responses/ThrottleRequestsException"
-                    },
                     "401": {
                         "description": "The access token is missing, expired, or not addressed to this API.",
                         "content": {
@@ -1374,6 +1365,15 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "422": {
+                        "$ref": "#/components/responses/ValidationException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
                     }
                 },
                 "security": [
@@ -1440,12 +1440,6 @@
                             }
                         }
                     },
-                    "404": {
-                        "$ref": "#/components/responses/ModelNotFoundException"
-                    },
-                    "429": {
-                        "$ref": "#/components/responses/ThrottleRequestsException"
-                    },
                     "401": {
                         "description": "The access token is missing, expired, or not addressed to this API.",
                         "content": {
@@ -1499,6 +1493,12 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/ModelNotFoundException"
+                    },
+                    "429": {
+                        "$ref": "#/components/responses/ThrottleRequestsException"
                     }
                 },
                 "security": [
