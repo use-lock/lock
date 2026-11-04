@@ -10411,16 +10411,16 @@
         },
         {
             "name": "use-lock/server",
-            "version": "0.3.0",
+            "version": "0.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/use-lock/server.git",
-                "reference": "22506bdadc65cad78af7a9bdcae6ddfef52a9183"
+                "reference": "cd232945d7b0eecc2c13344fbd3c8d62ece4dce4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/use-lock/server/zipball/22506bdadc65cad78af7a9bdcae6ddfef52a9183",
-                "reference": "22506bdadc65cad78af7a9bdcae6ddfef52a9183",
+                "url": "https://api.github.com/repos/use-lock/server/zipball/cd232945d7b0eecc2c13344fbd3c8d62ece4dce4",
+                "reference": "cd232945d7b0eecc2c13344fbd3c8d62ece4dce4",
                 "shasum": ""
             },
             "require": {
@@ -10507,7 +10507,7 @@
                 "issues": "https://github.com/use-lock/server/issues",
                 "source": "https://github.com/use-lock/server"
             },
-            "time": "2026-09-23T17:46:39+00:00"
+            "time": "2026-11-03T14:57:34+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
