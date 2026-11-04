@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1](https://github.com/use-lock/lock/compare/v0.3.0...v0.3.1) (2026-11-04)
+
+
+### Bug Fixes
+
+* update use-lock/server to 0.3.1 ([#38](https://github.com/use-lock/lock/issues/38)) ([0d0c1be](https://github.com/use-lock/lock/commit/0d0c1be9c7310cefc0e7b9edbc5017604a2d7d30))
+
 ## [0.3.0](https://github.com/use-lock/lock/compare/v0.2.0...v0.3.0) (2026-11-03)
 
 
